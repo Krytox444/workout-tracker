@@ -119,7 +119,6 @@ svg.chart{display:block;width:100%;overflow:visible}
       <div class="stat"><div class="stat-label">Total volumen</div><div class="stat-value blue" id="total-vol">0 kg</div></div>
     </div>
     <div id="quick-templates"></div>
-    <div id="custom-exercises-section"></div>
     <div class="section-label">Ny øvelse</div>
     <div class="search-wrap">
       <input type="text" id="exercise-input" placeholder="Søg øvelse (fx Dødløft)..." oninput="onExInput(this.value)" autocomplete="off">
@@ -152,6 +151,7 @@ svg.chart{display:block;width:100%;overflow:visible}
       <button class="btn btn-secondary" id="tpl-cancel-btn" style="display:none" onclick="cancelEditTpl()">Annuller redigering</button>
     </div>
     <div style="margin-top:16px" id="template-list"></div>
+    <div id="custom-exercises-section"></div>
   </div>
 
   <!-- PROGRESSION -->
@@ -302,20 +302,28 @@ function assignCat(name, cat) {
   document.getElementById('cat-picker')?.remove();
   renderCustomExercises();
 }
+let customExOpen = false;
 function renderCustomExercises() {
   const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
   const el = document.getElementById('custom-exercises-section');
   const names = Object.keys(customCats);
   if (!names.length) { el.innerHTML = ''; return; }
-  el.innerHTML = `<div class="section-label">Mine øvelser</div>`
-    + names.map(name => `
+  el.innerHTML = `
+    <div class="date-header" onclick="customExOpen=!customExOpen;renderCustomExercises()" style="margin-top:8px">
+      <div class="date-left">
+        <span class="expand-icon" style="transform:rotate(${customExOpen?'0':'270'}deg)">▼</span>
+        <span class="date-label">Mine øvelser</span>
+        <span class="date-count">${names.length} øvelse${names.length!==1?'r':''}</span>
+      </div>
+    </div>
+    ${customExOpen ? names.map(name => `
       <div style="display:flex;align-items:center;justify-content:space-between;background:#0f172a;border-radius:10px;padding:12px 14px;margin-bottom:6px;min-height:52px">
         <div>
           <div style="font-size:14px;font-weight:600">${name}</div>
           <div style="font-size:11px;color:#64748b">${customCats[name]}</div>
         </div>
         <button style="background:#7f1d1d;color:#fca5a5;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;min-width:56px;min-height:44px;flex-shrink:0;margin-left:12px" onclick="deleteCustomEx('${name.replace(/'/g,"\\'")}')">Slet</button>
-      </div>`).join('');
+      </div>`).join('') : ''}`;
 }
 function deleteCustomEx(name) {
   const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
@@ -622,8 +630,8 @@ function showTab(tab) {
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['log','templates','progress'][i]===tab));
   closeDD();
   if (tab==='progress')  { renderExSelect(); renderProgress(); }
-  if (tab==='templates')   renderTemplates();
-  if (tab==='log')       { renderLog(); renderQuickTemplates(); renderCustomExercises(); updateStats(); }
+  if (tab==='templates') { renderTemplates(); renderCustomExercises(); }
+  if (tab==='log')       { renderLog(); renderQuickTemplates(); updateStats(); }
 }
 
 // Load saved custom categories into EX_CAT on init
@@ -635,7 +643,6 @@ addSetRow();
 renderLog();
 updateStats();
 renderQuickTemplates();
-renderCustomExercises();
 // Open today's group by default
 if (workouts.length) { expandedDates.add(workouts[0].displayDate); renderLog(); }
 </script>
