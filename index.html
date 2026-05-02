@@ -95,6 +95,11 @@ svg.chart{display:block;width:100%;overflow:visible}
 .quick-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
 .quick-scroll::-webkit-scrollbar{display:none}
 .green{color:#34d399}.red{color:#f87171}.blue{color:#60a5fa}
+/* Settings modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:#1e293b;border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:600px;max-height:80vh;overflow-y:auto}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.modal-title{font-size:17px;font-weight:700}
 </style>
 </head>
 <body>
@@ -105,6 +110,7 @@ svg.chart{display:block;width:100%;overflow:visible}
       <path d="M6.5 6.5l11 11M17 7l1.5-1.5a2 2 0 0 1 2.83 2.83L19.83 9.8a2 2 0 0 1-2.83 0L17 9.63A2 2 0 0 1 17 7zM7 17l-1.5 1.5a2 2 0 0 1-2.83-2.83L4.17 14.2a2 2 0 0 1 2.83 0L7 14.37A2 2 0 0 1 7 17z"/>
     </svg>
     Workout Tracker
+    <button class="btn-icon" onclick="openSettings()" style="margin-left:auto;font-size:20px;padding:4px 8px">⚙️</button>
   </h1>
   <div class="tabs">
     <button class="tab active" onclick="showTab('log')">📋 Log</button>
@@ -128,8 +134,11 @@ svg.chart{display:block;width:100%;overflow:visible}
       <p>Sidst du trænede denne øvelse:</p>
       <div class="hint-chips" id="hint-sets"></div>
     </div>
+    <div id="bw-info" style="display:none" class="hint-box">
+      <div id="bw-info-content"></div>
+    </div>
     <div class="set-row" style="margin-bottom:4px">
-      <span></span><span style="font-size:11px;color:#475569;text-align:center">REPS</span><span style="font-size:11px;color:#475569;text-align:center">KG</span><span></span>
+      <span></span><span style="font-size:11px;color:#475569;text-align:center">REPS</span><span id="kg-label" style="font-size:11px;color:#475569;text-align:center">KG</span><span></span>
     </div>
     <div id="sets-container"></div>
     <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
@@ -164,6 +173,22 @@ svg.chart{display:block;width:100%;overflow:visible}
 <div id="workout-log"></div>
 </div>
 
+<!-- Settings modal -->
+<div id="settings-modal" style="display:none" class="modal-overlay" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">⚙️ Indstillinger</span>
+      <button class="btn-icon" onclick="closeSettings()" style="font-size:20px">✕</button>
+    </div>
+    <div class="section-label">Kropsmål</div>
+    <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Kropsvægt (kg)</label>
+    <input type="number" id="set-bodyweight" placeholder="fx 80" min="30" max="300" step="0.5" inputmode="decimal">
+    <label style="font-size:12px;color:#64748b;display:block;margin-bottom:4px">Højde (cm)</label>
+    <input type="number" id="set-height" placeholder="fx 180" min="100" max="250" inputmode="numeric">
+    <button class="btn btn-primary" onclick="saveSettings()">💾 Gem indstillinger</button>
+  </div>
+</div>
+
 <script>
 // ── Data ────────────────────────────────────────────────────────
 let workouts  = JSON.parse(localStorage.getItem('wt_workouts')  || '[]');
@@ -186,6 +211,39 @@ const EXERCISES = {
 const ALL_EX = Object.values(EXERCISES).flat();
 const EX_CAT = {};
 Object.entries(EXERCISES).forEach(([cat, exs]) => exs.forEach(e => EX_CAT[e] = cat));
+
+const BW_EXERCISES = new Set(['Pull-ups','Chin-ups','Dips','Push-ups','Diamond Push-ups','Planke','Crunches','Leg Raises','Russian Twist','Ab Rollout','Hanging Leg Raise','Side Planke','Step-ups']);
+
+function getSettings() { return JSON.parse(localStorage.getItem('wt_settings') || '{}'); }
+function openSettings() {
+  const s=getSettings();
+  document.getElementById('set-bodyweight').value=s.bodyweight||'';
+  document.getElementById('set-height').value=s.height||'';
+  document.getElementById('settings-modal').style.display='flex';
+}
+function closeSettings() { document.getElementById('settings-modal').style.display='none'; }
+function saveSettings() {
+  const bw=parseFloat(document.getElementById('set-bodyweight').value);
+  const h=parseInt(document.getElementById('set-height').value);
+  const s=getSettings();
+  if (bw>0) s.bodyweight=bw;
+  if (h>0) s.height=h;
+  localStorage.setItem('wt_settings',JSON.stringify(s));
+  closeSettings();
+  updateBWInfo(document.getElementById('exercise-input').value.trim());
+}
+function updateBWInfo(exName) {
+  const isBW=BW_EXERCISES.has(exName);
+  const box=document.getElementById('bw-info');
+  const lbl=document.getElementById('kg-label');
+  if (!isBW) { box.style.display='none'; lbl.textContent='KG'; return; }
+  const bw=getSettings().bodyweight;
+  lbl.textContent='+KG (ekstra)';
+  box.style.display='';
+  document.getElementById('bw-info-content').innerHTML = bw
+    ? `<span style="font-size:13px">Kropsvægt: <strong style="color:#34d399">${bw} kg</strong> — tilføj evt. ekstra kg per set</span>`
+    : `<span style="font-size:13px;color:#fb923c">⚠️ Sæt din kropsvægt i <button onclick="openSettings()" style="background:none;border:none;color:#60a5fa;cursor:pointer;font-size:13px;font-weight:600;padding:0">Indstillinger ⚙️</button> for at beregne volumen</span>`;
+}
 
 // ── Helpers ─────────────────────────────────────────────────────
 const calc1RM  = (w,r) => r<=0 ? w : Math.round(w*(1+r/30));
@@ -268,6 +326,7 @@ function onExInput(val) {
     box.style.display='';
     document.getElementById('hint-sets').innerHTML=last.sets.map(s=>`<span class="hint-chip">${s.reps}×${s.weight}kg</span>`).join('');
   } else box.style.display='none';
+  updateBWInfo(val);
 }
 function selectExercise(name) {
   document.getElementById('exercise-input').value = name;
@@ -350,19 +409,24 @@ function renumberSets() {
 function saveWorkout() {
   const ex=document.getElementById('exercise-input').value.trim();
   if (!ex) return alert('Indtast øvelsesnavn!');
+  const isBW=BW_EXERCISES.has(ex);
+  const bw=getSettings().bodyweight;
+  if (isBW&&!bw) return alert('Sæt din kropsvægt i Indstillinger (⚙️) før du logger denne øvelse!');
   const sets=[];
   document.querySelectorAll('#sets-container .set-row').forEach(row=>{
     const [i1,i2]=row.querySelectorAll('input');
-    const r=parseInt(i1.value),w=parseFloat(i2.value);
-    if (r>0&&w>0) sets.push({reps:r,weight:w});
+    const r=parseInt(i1.value),extra=parseFloat(i2.value)||0;
+    if (isBW) { if (r>0) sets.push({reps:r,weight:bw+extra,extraKg:extra,bw:true}); }
+    else { if (r>0&&extra>0) sets.push({reps:r,weight:extra}); }
   });
-  if (!sets.length) return alert('Tilføj mindst ét set med reps og kg!');
+  if (!sets.length) return alert('Tilføj mindst ét set med reps'+(isBW?'':' og kg')+'!');
   workouts.unshift({id:Date.now(),exercise:ex,sets,date:new Date().toISOString(),displayDate:new Date().toLocaleDateString('da-DK')});
   save();
   document.getElementById('exercise-input').value='';
   document.getElementById('hint-box').style.display='none';
   document.getElementById('sets-container').innerHTML='';
   setCount=1; addSetRow();
+  updateBWInfo('');
   renderLog(); updateStats();
 }
 function deleteWorkout(id) {
