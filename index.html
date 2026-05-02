@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f172a">
 <title>Workout Tracker</title>
@@ -20,60 +20,85 @@ h1{font-size:22px;font-weight:700;margin-bottom:14px;display:flex;align-items:ce
 .stat{background:#0f172a;border-radius:10px;padding:12px}
 .stat-label{font-size:11px;color:#64748b;margin-bottom:2px}
 .stat-value{font-size:24px;font-weight:700}
-input,select,textarea{width:100%;padding:11px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:15px;margin-bottom:8px;outline:none;-webkit-appearance:none}
+/* Search + dropdown */
+.search-wrap{position:relative;margin-bottom:8px}
+.search-wrap input{margin-bottom:0}
+.dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:10px;z-index:200;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none;max-height:260px;overflow-y:auto}
+.dropdown.show{display:block}
+.dd-cat{padding:5px 12px;font-size:10px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#0f172a;position:sticky;top:0}
+.dd-item{padding:10px 14px;cursor:pointer;font-size:14px}
+.dd-item:hover,.dd-item:active{background:#334155}
+.hl{color:#60a5fa;font-weight:700}
+/* Inputs */
+input,select{width:100%;padding:11px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:15px;margin-bottom:8px;outline:none;-webkit-appearance:none}
 input:focus,select:focus{border-color:#2563eb}
 input::placeholder{color:#475569}
-.set-row{display:grid;grid-template-columns:36px 1fr 1fr 32px;gap:6px;align-items:center;margin-bottom:6px}
+.set-row{display:grid;grid-template-columns:32px 1fr 1fr 32px;gap:6px;align-items:center;margin-bottom:6px}
 .set-row span{color:#64748b;font-size:12px;font-weight:600;text-align:center}
 .set-row input{margin-bottom:0}
+/* Buttons */
 .btn{width:100%;padding:12px;border:none;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;margin-top:6px}
 .btn-primary{background:#2563eb;color:#fff}
 .btn-secondary{background:#334155;color:#cbd5e1}
 .btn-sm{padding:7px 12px;font-size:13px;border-radius:6px;border:none;cursor:pointer;font-weight:600}
-.btn-danger-icon{background:none;border:none;color:#475569;cursor:pointer;padding:4px;font-size:16px;line-height:1}
-/* Workout cards - compact mobile */
-.w-card{background:#1e293b;border:1px solid #334155;border-radius:12px;margin-bottom:8px;overflow:hidden}
-.w-card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer}
+.btn-icon{background:none;border:none;color:#64748b;cursor:pointer;padding:4px 8px;font-size:14px;border-radius:6px}
+.btn-icon:hover{background:#334155}
+.btn-del{background:none;border:none;color:#475569;cursor:pointer;padding:4px;font-size:15px;line-height:1}
+/* Date groups */
+.date-group{margin-bottom:8px}
+.date-header{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#1e293b;border:1px solid #334155;border-radius:10px;cursor:pointer;margin-bottom:5px;user-select:none}
+.date-left{display:flex;align-items:center;gap:8px}
+.date-label{font-weight:700;font-size:14px}
+.date-count{font-size:12px;color:#64748b}
+.date-vol{font-size:12px;color:#60a5fa;font-weight:600}
+.expand-icon{color:#475569;font-size:10px;transition:transform .2s;flex-shrink:0}
+/* Workout cards */
+.w-card{background:#0f172a;border:1px solid #1e293b;border-radius:10px;margin-bottom:5px;overflow:hidden}
+.w-card-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer}
 .w-card-left{flex:1;min-width:0}
-.w-card-name{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.w-card-name{font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .w-card-meta{font-size:11px;color:#64748b;margin-top:2px}
-.w-card-stats{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:8px}
+.w-card-right{display:flex;gap:5px;align-items:center;flex-shrink:0;margin-left:8px}
 .chip{font-size:11px;font-weight:700;padding:3px 7px;border-radius:20px;white-space:nowrap}
 .chip-blue{background:#1e3a5f;color:#60a5fa}
 .chip-orange{background:#431407;color:#fb923c}
-.w-card-sets{padding:0 14px 12px;border-top:1px solid #0f172a}
-.sets-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
-.set-chip{background:#0f172a;border-radius:6px;padding:5px 9px;font-size:12px;color:#94a3b8}
+.sets-grid{display:flex;flex-wrap:wrap;gap:5px;padding:0 12px 10px;border-top:1px solid #1e293b;padding-top:8px;margin-top:0}
+.set-chip{background:#1e293b;border-radius:6px;padding:5px 9px;font-size:12px;color:#94a3b8}
 .set-chip strong{color:#e2e8f0}
-.expand-icon{color:#475569;font-size:11px;margin-left:6px;transition:transform .2s}
 /* Templates */
-.template-card{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:8px}
-.template-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.template-name{font-weight:700;font-size:15px}
-.template-exercises{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.tpl-card{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:8px}
+.tpl-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.tpl-name{font-weight:700;font-size:15px}
+.tpl-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
 .ex-tag{background:#1e3a5f;color:#60a5fa;padding:3px 8px;border-radius:20px;font-size:12px}
-.template-actions{display:flex;gap:6px}
+.tpl-actions{display:flex;gap:6px;flex-wrap:wrap}
+/* Hint box */
 .hint-box{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px;margin-bottom:8px}
 .hint-box p{font-size:11px;color:#64748b;margin-bottom:5px}
-.hint-sets{display:flex;flex-wrap:wrap;gap:4px}
+.hint-chips{display:flex;flex-wrap:wrap;gap:4px}
 .hint-chip{background:#1e293b;border-radius:5px;padding:3px 7px;font-size:12px;color:#94a3b8}
 /* Chart */
-.chart-container{position:relative;user-select:none}
+.chart-wrap{position:relative;user-select:none}
 svg.chart{display:block;width:100%;overflow:visible}
-.tooltip{position:absolute;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 10px;font-size:12px;pointer-events:none;display:none;min-width:120px;z-index:10}
-.tooltip-date{color:#64748b;margin-bottom:4px;font-size:11px}
-.tooltip-row{display:flex;align-items:center;gap:5px;margin-bottom:2px}
-.tooltip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.empty{text-align:center;padding:40px 0;color:#475569}
-.blue{color:#60a5fa}.green{color:#34d399}.orange{color:#fb923c}.red{color:#f87171}
+.tooltip{position:absolute;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 10px;font-size:12px;pointer-events:none;display:none;min-width:130px;z-index:10}
+.tt-date{color:#64748b;margin-bottom:4px;font-size:11px}
+.tt-row{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.tt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* Misc */
 .section-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.empty{text-align:center;padding:40px 0;color:#475569}
+.quick-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.quick-scroll::-webkit-scrollbar{display:none}
+.green{color:#34d399}.red{color:#f87171}.blue{color:#60a5fa}
 </style>
 </head>
 <body>
 <div class="container">
 <div class="card">
   <h1>
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><path d="M6.5 6.5l11 11M17 7l1.5-1.5a2 2 0 0 1 2.83 2.83L19.83 9.8a2 2 0 0 1-2.83 0L17 9.63A2 2 0 0 1 17 7zM7 17l-1.5 1.5a2 2 0 0 1-2.83-2.83L4.17 14.2a2 2 0 0 1 2.83 0L7 14.37A2 2 0 0 1 7 17z"/></svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5">
+      <path d="M6.5 6.5l11 11M17 7l1.5-1.5a2 2 0 0 1 2.83 2.83L19.83 9.8a2 2 0 0 1-2.83 0L17 9.63A2 2 0 0 1 17 7zM7 17l-1.5 1.5a2 2 0 0 1-2.83-2.83L4.17 14.2a2 2 0 0 1 2.83 0L7 14.37A2 2 0 0 1 7 17z"/>
+    </svg>
     Workout Tracker
   </h1>
   <div class="tabs">
@@ -90,14 +115,16 @@ svg.chart{display:block;width:100%;overflow:visible}
     </div>
     <div id="quick-templates"></div>
     <div class="section-label">Ny øvelse</div>
-    <input type="text" id="exercise-input" placeholder="Øvelse (fx Bænkpres)" oninput="onExInput(this.value)" list="ex-list" autocomplete="off">
-    <datalist id="ex-list"></datalist>
+    <div class="search-wrap">
+      <input type="text" id="exercise-input" placeholder="Søg øvelse (fx Dødløft)..." oninput="onExInput(this.value)" onfocus="onExInput(this.value)" autocomplete="off">
+      <div class="dropdown" id="ex-dd"></div>
+    </div>
     <div id="hint-box" style="display:none" class="hint-box">
-      <p>Sidste session:</p>
-      <div class="hint-sets" id="hint-sets"></div>
+      <p>Sidst du trænede denne øvelse:</p>
+      <div class="hint-chips" id="hint-sets"></div>
     </div>
     <div class="set-row" style="margin-bottom:4px">
-      <span></span><span style="text-align:center;font-size:11px;color:#475569">REPS</span><span style="text-align:center;font-size:11px;color:#475569">KG</span><span></span>
+      <span></span><span style="font-size:11px;color:#475569;text-align:center">REPS</span><span style="font-size:11px;color:#475569;text-align:center">KG</span><span></span>
     </div>
     <div id="sets-container"></div>
     <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
@@ -106,22 +133,24 @@ svg.chart{display:block;width:100%;overflow:visible}
 
   <!-- TEMPLATES -->
   <div id="tab-templates" style="display:none">
-    <div class="section-label">Gem nuværende workout som template</div>
-    <input type="text" id="tpl-name" placeholder="Template navn (fx Push Day)">
-    <div id="tpl-exercises-input">
+    <div id="tpl-form">
+      <div class="section-label" id="tpl-form-label">Ny template</div>
+      <input type="text" id="tpl-name" placeholder="Navn (fx Push Day)">
       <div id="tpl-ex-list"></div>
-      <input type="text" id="tpl-ex-input" placeholder="Tilføj øvelse..." list="ex-list" onkeydown="if(event.key==='Enter'){addTplEx()}">
-      <button class="btn btn-secondary" onclick="addTplEx()">+ Tilføj øvelse</button>
+      <div class="search-wrap">
+        <input type="text" id="tpl-ex-input" placeholder="Søg og tilføj øvelse..." oninput="onTplExInput(this.value)" onfocus="onTplExInput(this.value)" autocomplete="off">
+        <div class="dropdown" id="tpl-dd"></div>
+      </div>
+      <button class="btn btn-secondary" onclick="addTplExFromInput()">+ Tilføj øvelse</button>
+      <button class="btn btn-primary" onclick="saveTemplate()" style="margin-top:4px">💾 Gem template</button>
+      <button class="btn btn-secondary" id="tpl-cancel-btn" style="display:none" onclick="cancelEditTpl()">Annuller redigering</button>
     </div>
-    <button class="btn btn-primary" onclick="saveTemplate()" style="margin-top:4px">💾 Gem template</button>
     <div style="margin-top:16px" id="template-list"></div>
   </div>
 
   <!-- PROGRESSION -->
   <div id="tab-progress" style="display:none">
-    <select id="ex-select" onchange="renderProgress()">
-      <option value="">Vælg øvelse...</option>
-    </select>
+    <select id="ex-select" onchange="renderProgress()"><option value="">Vælg øvelse...</option></select>
     <div id="progress-content"></div>
   </div>
 </div>
@@ -130,365 +159,408 @@ svg.chart{display:block;width:100%;overflow:visible}
 </div>
 
 <script>
-let workouts = JSON.parse(localStorage.getItem('wt_workouts') || '[]');
+// ── Data ────────────────────────────────────────────────────────
+let workouts  = JSON.parse(localStorage.getItem('wt_workouts')  || '[]');
 let templates = JSON.parse(localStorage.getItem('wt_templates') || '[]');
-let setCount = 1;
-let tplExercises = [];
-let expandedCards = new Set();
-
 const save = () => {
-  localStorage.setItem('wt_workouts', JSON.stringify(workouts));
+  localStorage.setItem('wt_workouts',  JSON.stringify(workouts));
   localStorage.setItem('wt_templates', JSON.stringify(templates));
 };
 
-const calc1RM = (w, r) => r <= 0 ? w : Math.round(w * (1 + r / 30));
-const calcVol = sets => sets.reduce((s, x) => s + x.reps * x.weight, 0);
-const getMax1RM = sets => Math.max(...sets.map(s => calc1RM(s.weight, s.reps)));
+const EXERCISES = {
+  'Bryst':     ['Bænkpres','Incline Bænkpres','Decline Bænkpres','Dips','Kabelflyes','Dumbbell Flyes','Push-ups','Chest Press Maskine','Pec Deck'],
+  'Ryg':       ['Dødløft','Pull-ups','Chin-ups','Bent-over Row','Cable Row','Lat Pulldown','T-bar Row','Seated Row','Rack Pull',"Farmer's Carry",'Pendlay Row'],
+  'Skuldre':   ['Skulderpress','Lateral Raise','Front Raise','Face Pull','Arnold Press','Upright Row','Rear Delt Fly','Overhead Press','Cable Lateral Raise'],
+  'Ben':       ['Squat','Front Squat','Leg Press','Lunges','Romanian Deadlift','Leg Curl','Leg Extension','Bulgarian Split Squat','Hip Thrust','Calf Raises','Step-ups','Hack Squat','Sumo Deadlift','Goblet Squat'],
+  'Biceps':    ['Barbell Curl','Dumbbell Curl','Hammer Curl','Preacher Curl','Cable Curl','Concentration Curl','Spider Curl','Incline Dumbbell Curl'],
+  'Triceps':   ['Tricep Pushdown','Skullcrusher','Overhead Tricep Extension','Close-grip Bænkpres','Tricep Kickback','JM Press','Diamond Push-ups'],
+  'Core':      ['Planke','Crunches','Leg Raises','Russian Twist','Cable Crunch','Ab Rollout','Hanging Leg Raise','Side Planke'],
+  'Kondition': ['Løb','Cykling','Roning','Jump Rope','Assault Bike','Svømning']
+};
+const ALL_EX = Object.values(EXERCISES).flat();
+const EX_CAT = {};
+Object.entries(EXERCISES).forEach(([cat, exs]) => exs.forEach(e => EX_CAT[e] = cat));
 
-function showTab(tab) {
-  ['log','templates','progress'].forEach(t => {
-    document.getElementById('tab-'+t).style.display = t === tab ? '' : 'none';
-  });
-  document.querySelectorAll('.tab').forEach((el, i) => {
-    el.classList.toggle('active', ['log','templates','progress'][i] === tab);
-  });
-  if (tab === 'progress') { renderExSelect(); renderProgress(); }
-  if (tab === 'templates') renderTemplates();
-  if (tab === 'log') { renderLog(); renderQuickTemplates(); }
+// ── Helpers ─────────────────────────────────────────────────────
+const calc1RM  = (w,r) => r<=0 ? w : Math.round(w*(1+r/30));
+const calcVol  = sets  => sets.reduce((s,x) => s + x.reps*x.weight, 0);
+const getMax1RM= sets  => Math.max(...sets.map(s => calc1RM(s.weight,s.reps)));
+const getMaxW  = sets  => Math.max(...sets.map(s => s.weight));
+
+// ── Fuzzy search ─────────────────────────────────────────────────
+function fuzzyScore(str, q) {
+  str = str.toLowerCase(); q = q.toLowerCase();
+  if (str === q)         return 100;
+  if (str.startsWith(q)) return 90;
+  if (str.includes(q))   return 80;
+  let qi=0;
+  for (let i=0; i<str.length && qi<q.length; i++) if (str[i]===q[qi]) qi++;
+  if (qi===q.length) return 55+(qi/str.length)*20;
+  let m=0; for (const c of q) if (str.includes(c)) m++;
+  return (m/q.length)*35;
+}
+function getMatches(query, limit=8) {
+  const custom = workouts.map(w=>w.exercise).filter(e=>!ALL_EX.includes(e));
+  const pool   = [...new Set([...ALL_EX,...custom])];
+  if (!query) return pool.slice(0,limit).map(ex=>({ex,score:50}));
+  return pool.map(ex=>({ex,score:fuzzyScore(ex,query)}))
+    .filter(x=>x.score>20).sort((a,b)=>b.score-a.score).slice(0,limit);
+}
+function hl(text, query) {
+  if (!query) return text;
+  const i = text.toLowerCase().indexOf(query.toLowerCase());
+  if (i===-1) return text;
+  return text.slice(0,i)+`<span class="hl">${text.slice(i,i+query.length)}</span>`+text.slice(i+query.length);
 }
 
-function addSetRow(reps='', weight='') {
-  const c = document.getElementById('sets-container');
-  const n = setCount++;
-  const d = document.createElement('div');
-  d.className = 'set-row';
-  d.dataset.n = n;
-  d.innerHTML = `<span style="color:#64748b;font-size:12px;font-weight:600;text-align:center">${n}</span>
-    <input type="number" placeholder="0" value="${reps}" min="1" inputmode="numeric">
-    <input type="number" placeholder="0" value="${weight}" min="0" step="0.5" inputmode="decimal">
-    <button class="btn-danger-icon" onclick="this.parentNode.remove();renumberSets()">✕</button>`;
-  c.appendChild(d);
+// ── Dropdown ─────────────────────────────────────────────────────
+document.addEventListener('click', e => { if (!e.target.closest('.search-wrap')) closeDD(); });
+
+function closeDD() {
+  document.querySelectorAll('.dropdown').forEach(d => d.classList.remove('show'));
 }
 
-function renumberSets() {
-  document.querySelectorAll('#sets-container .set-row').forEach((r, i) => {
-    r.querySelector('span').textContent = i + 1;
+function renderDD(ddId, query, onSelect) {
+  const dd = document.getElementById(ddId);
+  const matches = getMatches(query);
+  if (!matches.length) { dd.classList.remove('show'); return; }
+  const grouped = {};
+  matches.forEach(({ex}) => {
+    const cat = EX_CAT[ex] || 'Egne øvelser';
+    (grouped[cat]=grouped[cat]||[]).push(ex);
   });
-  setCount = document.querySelectorAll('#sets-container .set-row').length + 1;
+  dd.innerHTML = Object.entries(grouped).map(([cat,exs]) =>
+    `<div class="dd-cat">${cat}</div>`
+    + exs.map(ex => `<div class="dd-item" onmousedown="event.preventDefault()" onclick="${onSelect}('${ex.replace(/'/g,"\\'")}')">${hl(ex,query)}</div>`).join('')
+  ).join('');
+  dd.classList.add('show');
 }
+
+// ── Log ──────────────────────────────────────────────────────────
+let setCount=1, expandedDates=new Set(), expandedCards=new Set();
 
 function onExInput(val) {
-  const last = workouts.find(w => w.exercise.toLowerCase() === val.toLowerCase());
-  const box = document.getElementById('hint-box');
+  renderDD('ex-dd', val, 'selectExercise');
+  const last = workouts.find(w=>w.exercise.toLowerCase()===val.toLowerCase());
+  const box  = document.getElementById('hint-box');
   if (last) {
-    box.style.display = '';
-    document.getElementById('hint-sets').innerHTML = last.sets.map(s =>
-      `<span class="hint-chip">${s.reps}×${s.weight}kg</span>`).join('');
-  } else box.style.display = 'none';
+    box.style.display='';
+    document.getElementById('hint-sets').innerHTML=last.sets.map(s=>`<span class="hint-chip">${s.reps}×${s.weight}kg</span>`).join('');
+  } else box.style.display='none';
 }
-
+function selectExercise(name) {
+  document.getElementById('exercise-input').value=name;
+  closeDD(); onExInput(name);
+}
+function addSetRow(reps='',weight='') {
+  const c=document.getElementById('sets-container');
+  const n=setCount++;
+  const d=document.createElement('div');
+  d.className='set-row';
+  d.innerHTML=`<span style="color:#64748b;font-size:12px;font-weight:600;text-align:center">${n}</span>
+    <input type="number" placeholder="0" value="${reps}" min="1" inputmode="numeric">
+    <input type="number" placeholder="0" value="${weight}" min="0" step="0.5" inputmode="decimal">
+    <button class="btn-del" onclick="this.parentNode.remove();renumberSets()">✕</button>`;
+  c.appendChild(d);
+}
+function renumberSets() {
+  document.querySelectorAll('#sets-container .set-row').forEach((r,i)=>r.querySelector('span').textContent=i+1);
+  setCount=document.querySelectorAll('#sets-container .set-row').length+1;
+}
 function saveWorkout() {
-  const ex = document.getElementById('exercise-input').value.trim();
+  const ex=document.getElementById('exercise-input').value.trim();
   if (!ex) return alert('Indtast øvelsesnavn!');
-  const rows = document.querySelectorAll('#sets-container .set-row');
-  const sets = [];
-  rows.forEach(row => {
-    const [inp1, inp2] = row.querySelectorAll('input');
-    const r = parseInt(inp1.value), w = parseFloat(inp2.value);
-    if (r > 0 && w > 0) sets.push({ reps: r, weight: w });
+  const sets=[];
+  document.querySelectorAll('#sets-container .set-row').forEach(row=>{
+    const [i1,i2]=row.querySelectorAll('input');
+    const r=parseInt(i1.value),w=parseFloat(i2.value);
+    if (r>0&&w>0) sets.push({reps:r,weight:w});
   });
-  if (!sets.length) return alert('Tilføj mindst ét set!');
-  workouts.unshift({ id: Date.now(), exercise: ex, sets, date: new Date().toISOString(), displayDate: new Date().toLocaleDateString('da-DK') });
+  if (!sets.length) return alert('Tilføj mindst ét set med reps og kg!');
+  workouts.unshift({id:Date.now(),exercise:ex,sets,date:new Date().toISOString(),displayDate:new Date().toLocaleDateString('da-DK')});
   save();
-  document.getElementById('exercise-input').value = '';
-  document.getElementById('hint-box').style.display = 'none';
-  document.getElementById('sets-container').innerHTML = '';
-  setCount = 1; addSetRow();
-  renderLog(); updateStats(); updateDatalist();
+  document.getElementById('exercise-input').value='';
+  document.getElementById('hint-box').style.display='none';
+  document.getElementById('sets-container').innerHTML='';
+  setCount=1; addSetRow();
+  renderLog(); updateStats();
 }
-
 function deleteWorkout(id) {
-  workouts = workouts.filter(w => w.id !== id);
-  save(); renderLog(); updateStats();
+  workouts=workouts.filter(w=>w.id!==id); save(); renderLog(); updateStats();
 }
-
+function toggleDate(date) {
+  expandedDates.has(date)?expandedDates.delete(date):expandedDates.add(date); renderLog();
+}
 function toggleCard(id) {
-  if (expandedCards.has(id)) expandedCards.delete(id);
-  else expandedCards.add(id);
-  renderLog();
+  expandedCards.has(id)?expandedCards.delete(id):expandedCards.add(id); renderLog();
 }
-
 function renderLog() {
-  const el = document.getElementById('workout-log');
-  if (!workouts.length) { el.innerHTML = '<div class="empty">Ingen øvelser endnu 💪</div>'; return; }
-  el.innerHTML = workouts.map(w => {
-    const expanded = expandedCards.has(w.id);
-    const setsChips = w.sets.map((s,i) => `<span class="set-chip"><strong>S${i+1}</strong> ${s.reps}×${s.weight}kg</span>`).join('');
-    return `<div class="w-card">
-      <div class="w-card-header" onclick="toggleCard(${w.id})">
-        <div class="w-card-left">
-          <div class="w-card-name">${w.exercise}</div>
-          <div class="w-card-meta">${w.displayDate} · ${w.sets.length} sets</div>
+  const el=document.getElementById('workout-log');
+  if (!workouts.length) { el.innerHTML='<div class="empty">Ingen øvelser endnu 💪</div>'; return; }
+  const groups={};
+  workouts.forEach(w=>{ (groups[w.displayDate]=groups[w.displayDate]||[]).push(w); });
+  el.innerHTML=Object.entries(groups).map(([date,ws])=>{
+    const expanded=expandedDates.has(date);
+    const totalVol=ws.reduce((s,w)=>s+calcVol(w.sets),0);
+    const cards=ws.map(w=>{
+      const open=expandedCards.has(w.id);
+      return `<div class="w-card">
+        <div class="w-card-header" onclick="toggleCard(${w.id})">
+          <div class="w-card-left">
+            <div class="w-card-name">${w.exercise}</div>
+            <div class="w-card-meta">${w.sets.length} sets · max ${getMaxW(w.sets)}kg</div>
+          </div>
+          <div class="w-card-right">
+            <span class="chip chip-blue">${calcVol(w.sets)}kg</span>
+            <span class="chip chip-orange">1RM ${getMax1RM(w.sets)}kg</span>
+            <button class="btn-del" onclick="event.stopPropagation();deleteWorkout(${w.id})">🗑</button>
+            <span class="expand-icon" style="transform:rotate(${open?'180':'0'}deg)">▼</span>
+          </div>
         </div>
-        <div class="w-card-stats">
-          <span class="chip chip-blue">${calcVol(w.sets)}kg</span>
-          <span class="chip chip-orange">1RM ${getMax1RM(w.sets)}kg</span>
-          <button class="btn-danger-icon" onclick="event.stopPropagation();deleteWorkout(${w.id})">🗑</button>
-          <span class="expand-icon" style="transform:rotate(${expanded?'180':'0'}deg)">▼</span>
+        ${open?`<div class="sets-grid">${w.sets.map((s,i)=>`<span class="set-chip"><strong>S${i+1}</strong> ${s.reps}×${s.weight}kg</span>`).join('')}</div>`:''}</div>`;
+    }).join('');
+    return `<div class="date-group">
+      <div class="date-header" onclick="toggleDate('${date}')">
+        <div class="date-left">
+          <span class="expand-icon" style="transform:rotate(${expanded?'0':'270'}deg)">▼</span>
+          <span class="date-label">${date}</span>
+          <span class="date-count">${ws.length} øvelse${ws.length!==1?'r':''}</span>
         </div>
+        <span class="date-vol">${totalVol}kg</span>
       </div>
-      ${expanded ? `<div class="w-card-sets"><div class="sets-grid">${setsChips}</div></div>` : ''}
+      ${expanded?cards:''}
     </div>`;
   }).join('');
 }
-
 function updateStats() {
-  document.getElementById('total-count').textContent = workouts.length;
-  document.getElementById('total-vol').textContent = workouts.reduce((s, w) => s + calcVol(w.sets), 0) + ' kg';
+  document.getElementById('total-count').textContent=workouts.length;
+  document.getElementById('total-vol').textContent=workouts.reduce((s,w)=>s+calcVol(w.sets),0)+' kg';
 }
 
-function updateDatalist() {
-  const exercises = [...new Set(workouts.map(w => w.exercise))];
-  document.getElementById('ex-list').innerHTML = exercises.map(e => `<option value="${e}">`).join('');
-}
+// ── Templates ────────────────────────────────────────────────────
+let tplExList=[], editingTplId=null;
 
-// Templates
-let tplExList = [];
-function addTplEx() {
-  const inp = document.getElementById('tpl-ex-input');
-  const v = inp.value.trim();
-  if (!v) return;
-  tplExList.push(v);
-  inp.value = '';
-  renderTplExList();
+function onTplExInput(val) { renderDD('tpl-dd', val, 'selectTplEx'); }
+function selectTplEx(name) {
+  if (!tplExList.includes(name)) { tplExList.push(name); renderTplExList(); }
+  document.getElementById('tpl-ex-input').value=''; closeDD();
+}
+function addTplExFromInput() {
+  const v=document.getElementById('tpl-ex-input').value.trim();
+  if (v&&!tplExList.includes(v)) { tplExList.push(v); renderTplExList(); }
+  document.getElementById('tpl-ex-input').value=''; closeDD();
 }
 function renderTplExList() {
-  document.getElementById('tpl-ex-list').innerHTML = tplExList.map((e,i) =>
-    `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#0f172a;border-radius:7px;margin-bottom:5px">
+  document.getElementById('tpl-ex-list').innerHTML=tplExList.map((e,i)=>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:#0f172a;border-radius:7px;margin-bottom:5px">
       <span style="font-size:14px">${e}</span>
-      <button class="btn-danger-icon" onclick="tplExList.splice(${i},1);renderTplExList()">✕</button>
+      <button class="btn-del" onclick="tplExList.splice(${i},1);renderTplExList()">✕</button>
     </div>`).join('');
 }
 function saveTemplate() {
-  const name = document.getElementById('tpl-name').value.trim();
-  if (!name || !tplExList.length) return alert('Udfyld navn og tilføj øvelser');
-  templates.unshift({ id: Date.now(), name, exercises: [...tplExList] });
+  // Include anything still typed in the input
+  const typed=document.getElementById('tpl-ex-input').value.trim();
+  if (typed&&!tplExList.includes(typed)) tplExList.push(typed);
+  const name=document.getElementById('tpl-name').value.trim();
+  if (!name)            return alert('Giv templaten et navn!');
+  if (!tplExList.length) return alert('Tilføj mindst én øvelse!');
+  if (editingTplId) {
+    const idx=templates.findIndex(t=>t.id===editingTplId);
+    if (idx!==-1) templates[idx]={...templates[idx],name,exercises:[...tplExList]};
+    editingTplId=null;
+  } else {
+    templates.unshift({id:Date.now(),name,exercises:[...tplExList]});
+  }
   save();
-  document.getElementById('tpl-name').value = '';
-  tplExList = [];
-  renderTplExList();
-  renderTemplates();
-  renderQuickTemplates();
+  document.getElementById('tpl-name').value='';
+  document.getElementById('tpl-ex-input').value='';
+  tplExList=[]; renderTplExList(); renderTemplates(); renderQuickTemplates();
+  document.getElementById('tpl-form-label').textContent='Ny template';
+  document.getElementById('tpl-cancel-btn').style.display='none';
+}
+function editTemplate(id) {
+  const tpl=templates.find(t=>t.id===id); if (!tpl) return;
+  editingTplId=id;
+  document.getElementById('tpl-name').value=tpl.name;
+  tplExList=[...tpl.exercises]; renderTplExList();
+  document.getElementById('tpl-form-label').textContent='Rediger template';
+  document.getElementById('tpl-cancel-btn').style.display='';
+  document.getElementById('tpl-form').scrollIntoView({behavior:'smooth'});
+}
+function cancelEditTpl() {
+  editingTplId=null;
+  document.getElementById('tpl-name').value='';
+  document.getElementById('tpl-ex-input').value='';
+  tplExList=[]; renderTplExList();
+  document.getElementById('tpl-form-label').textContent='Ny template';
+  document.getElementById('tpl-cancel-btn').style.display='none';
 }
 function deleteTemplate(id) {
-  templates = templates.filter(t => t.id !== id);
-  save(); renderTemplates(); renderQuickTemplates();
-}
-function loadTemplate(id) {
-  const tpl = templates.find(t => t.id === id);
-  if (!tpl) return;
-  showTab('log');
-  document.getElementById('exercise-input').value = tpl.exercises[0] || '';
-  onExInput(tpl.exercises[0] || '');
-}
-function renderTemplates() {
-  const el = document.getElementById('template-list');
-  if (!templates.length) { el.innerHTML = '<div class="empty" style="padding:20px 0">Ingen templates endnu</div>'; return; }
-  el.innerHTML = '<div class="section-label">Gemte templates</div>' + templates.map(t => `
-    <div class="template-card">
-      <div class="template-header">
-        <span class="template-name">${t.name}</span>
-        <button class="btn-danger-icon" onclick="deleteTemplate(${t.id})">🗑</button>
-      </div>
-      <div class="template-exercises">${t.exercises.map(e => `<span class="ex-tag">${e}</span>`).join('')}</div>
-      <div class="template-actions">
-        ${t.exercises.map(e => `<button class="btn-sm btn-secondary" onclick="loadEx('${e.replace(/'/g,"\\'")}')">+ ${e}</button>`).join('')}
-      </div>
-    </div>`).join('');
+  templates=templates.filter(t=>t.id!==id); save(); renderTemplates(); renderQuickTemplates();
 }
 function loadEx(ex) {
   showTab('log');
-  document.getElementById('exercise-input').value = ex;
-  onExInput(ex);
+  document.getElementById('exercise-input').value=ex; onExInput(ex);
+}
+function renderTemplates() {
+  const el=document.getElementById('template-list');
+  if (!templates.length) { el.innerHTML='<div class="empty" style="padding:20px 0">Ingen templates endnu</div>'; return; }
+  el.innerHTML='<div class="section-label">Gemte templates</div>'
+    +templates.map(t=>`<div class="tpl-card">
+      <div class="tpl-header">
+        <span class="tpl-name">${t.name}</span>
+        <div style="display:flex;gap:4px">
+          <button class="btn-icon" onclick="editTemplate(${t.id})" title="Rediger">✏️</button>
+          <button class="btn-del" onclick="deleteTemplate(${t.id})">🗑</button>
+        </div>
+      </div>
+      <div class="tpl-tags">${t.exercises.map(e=>`<span class="ex-tag">${e}</span>`).join('')}</div>
+      <div class="tpl-actions">${t.exercises.map(e=>`<button class="btn-sm btn-secondary" onclick="loadEx('${e.replace(/'/g,"\\'")}')">${e}</button>`).join('')}</div>
+    </div>`).join('');
 }
 function renderQuickTemplates() {
-  const el = document.getElementById('quick-templates');
-  if (!templates.length) { el.innerHTML = ''; return; }
-  el.innerHTML = `<div class="section-label">Templates</div>
-    <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px">
-      ${templates.map(t => `<button class="btn-sm btn-secondary" style="flex-shrink:0;white-space:nowrap" onclick="showTemplateOptions(${t.id})">${t.name}</button>`).join('')}
-    </div>
-    <div id="tpl-options"></div>`;
+  const el=document.getElementById('quick-templates');
+  if (!templates.length) { el.innerHTML=''; return; }
+  el.innerHTML=`<div class="section-label">Templates</div>
+    <div class="quick-scroll">
+      ${templates.map(t=>`<button class="btn-sm btn-secondary" style="flex-shrink:0;white-space:nowrap" onclick="showTplOptions(${t.id})">${t.name}</button>`).join('')}
+    </div><div id="tpl-options"></div>`;
 }
-function showTemplateOptions(id) {
-  const tpl = templates.find(t => t.id === id);
-  if (!tpl) return;
-  document.getElementById('tpl-options').innerHTML = `
+function showTplOptions(id) {
+  const tpl=templates.find(t=>t.id===id); if (!tpl) return;
+  document.getElementById('tpl-options').innerHTML=`
     <div style="background:#0f172a;border-radius:8px;padding:10px;margin-bottom:10px">
       <div style="font-size:12px;color:#64748b;margin-bottom:6px">${tpl.name} – vælg øvelse:</div>
       <div style="display:flex;flex-wrap:wrap;gap:5px">
-        ${tpl.exercises.map(e => `<button class="btn-sm btn-primary" onclick="loadEx('${e.replace(/'/g,"\\'")}')">+ ${e}</button>`).join('')}
+        ${tpl.exercises.map(e=>`<button class="btn-sm btn-primary" onclick="loadEx('${e.replace(/'/g,"\\'")}')">${e}</button>`).join('')}
       </div>
     </div>`;
 }
 
-// Progression
+// ── Progression ──────────────────────────────────────────────────
 function renderExSelect() {
-  const exercises = [...new Set(workouts.map(w => w.exercise))];
-  const sel = document.getElementById('ex-select');
-  const cur = sel.value;
-  sel.innerHTML = '<option value="">Vælg øvelse...</option>' + exercises.map(e => `<option ${e===cur?'selected':''} value="${e}">${e}</option>`).join('');
+  const exercises=[...new Set(workouts.map(w=>w.exercise))];
+  const sel=document.getElementById('ex-select'), cur=sel.value;
+  sel.innerHTML='<option value="">Vælg øvelse...</option>'
+    +exercises.map(e=>`<option ${e===cur?'selected':''} value="${e}">${e}</option>`).join('');
 }
 function renderProgress() {
-  const ex = document.getElementById('ex-select').value;
-  const el = document.getElementById('progress-content');
-  if (!ex) { el.innerHTML = ''; return; }
-  const sessions = workouts.filter(w => w.exercise === ex).reverse();
-  if (!sessions.length) { el.innerHTML = '<div class="empty">Ingen data</div>'; return; }
-
-  let overloadHTML = '';
-  if (sessions.length >= 2) {
-    const latest = sessions[sessions.length-1], prev = sessions[sessions.length-2];
-    const vDiff = calcVol(latest.sets) - calcVol(prev.sets);
-    const rDiff = getMax1RM(latest.sets) - getMax1RM(prev.sets);
-    const prog = vDiff > 0 || rDiff > 0;
-    overloadHTML = `
-      <div style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:8px;margin-bottom:10px;font-weight:600;font-size:14px;${prog?'background:rgba(16,185,129,.12);border:1px solid #059669':'background:rgba(234,179,8,.1);border:1px solid #ca8a04'}">
-        ${prog ? '🏆 Du progresserer!' : '⚠️ Ingen fremgang siden sidst'}
-      </div>
-      <div class="stats" style="margin-bottom:10px">
-        <div class="stat"><div class="stat-label">Volumen ændring</div><div class="stat-value ${vDiff>=0?'green':'red'}">${vDiff>=0?'+':''}${vDiff}kg</div></div>
-        <div class="stat"><div class="stat-label">Styrke (est. 1RM)</div><div class="stat-value ${rDiff>=0?'green':'red'}">${rDiff>=0?'+':''}${rDiff}kg</div></div>
-      </div>`;
+  const ex=document.getElementById('ex-select').value;
+  const el=document.getElementById('progress-content');
+  if (!ex) { el.innerHTML=''; return; }
+  const sessions=workouts.filter(w=>w.exercise===ex).reverse();
+  if (!sessions.length) { el.innerHTML='<div class="empty">Ingen data</div>'; return; }
+  let overloadHTML='';
+  if (sessions.length>=2) {
+    const latest=sessions[sessions.length-1], prev=sessions[sessions.length-2];
+    const wDiff=getMaxW(latest.sets)-getMaxW(prev.sets);
+    const rDiff=getMax1RM(latest.sets)-getMax1RM(prev.sets);
+    const prog=wDiff>0||rDiff>0;
+    overloadHTML=`<div style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:8px;margin-bottom:10px;font-weight:600;font-size:14px;
+      ${prog?'background:rgba(16,185,129,.12);border:1px solid #059669':'background:rgba(234,179,8,.1);border:1px solid #ca8a04'}">
+      ${prog?'🏆 Du progresserer!':'⚠️ Ingen fremgang siden sidst'}
+    </div>
+    <div class="stats" style="margin-bottom:10px">
+      <div class="stat"><div class="stat-label">Max vægt ændring</div><div class="stat-value ${wDiff>=0?'green':'red'}">${wDiff>=0?'+':''}${wDiff}kg</div></div>
+      <div class="stat"><div class="stat-label">Styrke (est. 1RM)</div><div class="stat-value ${rDiff>=0?'green':'red'}">${rDiff>=0?'+':''}${rDiff}kg</div></div>
+    </div>`;
   }
-
-  el.innerHTML = `<div style="margin-top:12px">
+  el.innerHTML=`<div style="margin-top:12px">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
       <span style="font-size:16px;font-weight:700">${ex}</span>
       <span style="font-size:12px;color:#64748b">${sessions.length} sessions</span>
     </div>
     ${overloadHTML}
-    ${sessions.length >= 2 ? drawChart(sessions) : '<p style="color:#64748b;font-size:13px">Log mindst 2 sessions for graf</p>'}
+    ${sessions.length>=2?drawChart(sessions):'<p style="color:#64748b;font-size:13px;margin-top:8px">Log mindst 2 sessions for at se graf</p>'}
   </div>`;
-
-  if (sessions.length >= 2) initChartInteraction();
+  if (sessions.length>=2) initChart();
 }
-
 function drawChart(sessions) {
-  const data = sessions.map(s => ({
-    date: s.displayDate, vol: calcVol(s.sets), rm: getMax1RM(s.sets)
-  }));
-  const n = data.length;
-  const W = 540, H = 200;
-  const PAD = {t:20, r:50, b:35, l:50};
-  const iW = W - PAD.l - PAD.r, iH = H - PAD.t - PAD.b;
-
-  const vols = data.map(d => d.vol);
-  const rms = data.map(d => d.rm);
-  const vMin = Math.min(...vols)*0.9, vMax = Math.max(...vols)*1.1;
-  const rMin = Math.min(...rms)*0.9, rMax = Math.max(...rms)*1.1;
-
-  const xOf = i => PAD.l + (i/(n-1||1))*iW;
-  const yOfV = v => PAD.t + iH - ((v-vMin)/(vMax-vMin||1))*iH;
-  const yOfR = v => PAD.t + iH - ((v-rMin)/(rMax-rMin||1))*iH;
-
-  const volPts = data.map((d,i) => `${xOf(i)},${yOfV(d.vol)}`).join(' ');
-  const rmPts  = data.map((d,i) => `${xOf(i)},${yOfR(d.rm)}`).join(' ');
-
-  // Y axis labels left (volume) and right (1RM)
-  const yLabels = (min, max, side) => [0,0.5,1].map(t => {
-    const v = Math.round(min + t*(max-min));
-    const y = PAD.t + iH*(1-t);
-    const x = side==='left' ? PAD.l-6 : W-PAD.r+6;
-    const anchor = side==='left' ? 'end' : 'start';
-    return `<text x="${x}" y="${y+4}" text-anchor="${anchor}" fill="${side==='left'?'#34d399':'#fb923c'}" font-size="10">${v}</text>`;
+  const data=sessions.map(s=>({date:s.displayDate,vol:getMaxW(s.sets),rm:getMax1RM(s.sets)}));
+  const n=data.length, W=540, H=200, P={t:20,r:50,b:35,l:50};
+  const iW=W-P.l-P.r, iH=H-P.t-P.b;
+  const vols=data.map(d=>d.vol), rms=data.map(d=>d.rm);
+  const vMin=Math.min(...vols)*.9, vMax=Math.max(...vols)*1.1;
+  const rMin=Math.min(...rms)*.9,  rMax=Math.max(...rms)*1.1;
+  const xOf =i=>P.l+(i/(n-1||1))*iW;
+  const yOfV=v=>P.t+iH-((v-vMin)/(vMax-vMin||1))*iH;
+  const yOfR=v=>P.t+iH-((v-rMin)/(rMax-rMin||1))*iH;
+  const yLbl=(min,max,side)=>[0,.5,1].map(t=>{
+    const v=Math.round(min+t*(max-min)), y=P.t+iH*(1-t);
+    const x=side==='left'?P.l-6:W-P.r+6, a=side==='left'?'end':'start';
+    return `<text x="${x}" y="${y+4}" text-anchor="${a}" fill="${side==='left'?'#34d399':'#fb923c'}" font-size="10">${v}</text>`;
   }).join('');
-
-  // X labels (max 5)
-  const step = Math.max(1, Math.ceil(n/5));
-  const xLabels = data.map((d,i) => {
-    if (i % step !== 0 && i !== n-1) return '';
-    return `<text x="${xOf(i)}" y="${H-6}" text-anchor="middle" fill="#64748b" font-size="10">${d.date.slice(0,5)}</text>`;
-  }).join('');
-
-  // Dots with data attrs
-  const vDots = data.map((d,i) => `<circle class="dot" cx="${xOf(i)}" cy="${yOfV(d.vol)}" r="5" fill="#34d399" data-i="${i}" data-date="${d.date}" data-vol="${d.vol}" data-rm="${d.rm}"/>`).join('');
-  const rDots = data.map((d,i) => `<circle class="dot" cx="${xOf(i)}" cy="${yOfR(d.rm)}" r="5" fill="#fb923c" data-i="${i}" data-date="${d.date}" data-vol="${d.vol}" data-rm="${d.rm}"/>`).join('');
-
-  // Vertical guideline (hidden initially)
-  const vLine = `<line id="chart-vline" x1="0" y1="${PAD.t}" x2="0" y2="${PAD.t+iH}" stroke="#334155" stroke-width="1" stroke-dasharray="4" style="display:none"/>`;
-
-  return `<div class="chart-container" id="chart-wrap">
-    <div class="tooltip" id="chart-tooltip">
-      <div class="tooltip-date" id="tt-date"></div>
-      <div class="tooltip-row"><span class="tooltip-dot" style="background:#34d399"></span><span id="tt-vol"></span></div>
-      <div class="tooltip-row"><span class="tooltip-dot" style="background:#fb923c"></span><span id="tt-rm"></span></div>
+  const step=Math.max(1,Math.ceil(n/5));
+  const xLbl=data.map((d,i)=>i%step!==0&&i!==n-1?'':
+    `<text x="${xOf(i)}" y="${H-6}" text-anchor="middle" fill="#64748b" font-size="10">${d.date.slice(0,5)}</text>`).join('');
+  const vDots=data.map((d,i)=>`<circle class="dot" cx="${xOf(i)}" cy="${yOfV(d.vol)}" r="5" fill="#34d399" data-date="${d.date}" data-vol="${d.vol}" data-rm="${d.rm}"/>`).join('');
+  const rDots=data.map((d,i)=>`<circle class="dot" cx="${xOf(i)}" cy="${yOfR(d.rm)}"  r="5" fill="#fb923c" data-date="${d.date}" data-vol="${d.vol}" data-rm="${d.rm}"/>`).join('');
+  return `<div class="chart-wrap" id="chart-wrap">
+    <div class="tooltip" id="chart-tip">
+      <div class="tt-date" id="tt-date"></div>
+      <div class="tt-row"><span class="tt-dot" style="background:#34d399"></span><span id="tt-vol"></span></div>
+      <div class="tt-row"><span class="tt-dot" style="background:#fb923c"></span><span id="tt-rm"></span></div>
     </div>
     <svg class="chart" viewBox="0 0 ${W} ${H}" id="main-chart">
-      ${[0,0.5,1].map(t=>`<line x1="${PAD.l}" y1="${PAD.t+iH*(1-t)}" x2="${W-PAD.r}" y2="${PAD.t+iH*(1-t)}" stroke="#1e293b" stroke-width="1"/>`).join('')}
-      ${vLine}
-      ${yLabels(vMin,vMax,'left')}${yLabels(rMin,rMax,'right')}${xLabels}
-      <text x="${PAD.l-6}" y="${PAD.t-6}" text-anchor="end" fill="#34d399" font-size="10">Vol</text>
-      <text x="${W-PAD.r+6}" y="${PAD.t-6}" text-anchor="start" fill="#fb923c" font-size="10">1RM</text>
-      <polyline points="${volPts}" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-      <polyline points="${rmPts}" fill="none" stroke="#fb923c" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${[0,.5,1].map(t=>`<line x1="${P.l}" y1="${P.t+iH*(1-t)}" x2="${W-P.r}" y2="${P.t+iH*(1-t)}" stroke="#1e293b" stroke-width="1"/>`).join('')}
+      <line id="vline" x1="0" y1="${P.t}" x2="0" y2="${P.t+iH}" stroke="#334155" stroke-width="1" stroke-dasharray="4" style="display:none"/>
+      ${yLbl(vMin,vMax,'left')}${yLbl(rMin,rMax,'right')}${xLbl}
+      <text x="${P.l-6}" y="${P.t-6}" text-anchor="end" fill="#34d399" font-size="10">Vægt</text>
+      <text x="${W-P.r+6}" y="${P.t-6}" text-anchor="start" fill="#fb923c" font-size="10">1RM</text>
+      <polyline points="${data.map((d,i)=>`${xOf(i)},${yOfV(d.vol)}`).join(' ')}" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <polyline points="${data.map((d,i)=>`${xOf(i)},${yOfR(d.rm)}`).join(' ')}"  fill="none" stroke="#fb923c" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
       ${vDots}${rDots}
     </svg>
     <div style="display:flex;gap:14px;justify-content:center;margin-top:6px">
-      <span style="font-size:12px;color:#34d399">● Volumen (kg)</span>
+      <span style="font-size:12px;color:#34d399">● Max vægt (kg)</span>
       <span style="font-size:12px;color:#fb923c">● Est. 1RM (kg)</span>
     </div>
   </div>`;
 }
-
-function initChartInteraction() {
-  const svg = document.getElementById('main-chart');
-  const tooltip = document.getElementById('chart-tooltip');
-  const vline = document.getElementById('chart-vline');
+function initChart() {
+  const svg=document.getElementById('main-chart');
+  const tip=document.getElementById('chart-tip');
+  const vl =document.getElementById('vline');
   if (!svg) return;
-
-  const showTip = (dot, svgRect) => {
-    const date = dot.dataset.date;
-    const vol = dot.dataset.vol;
-    const rm = dot.dataset.rm;
-    document.getElementById('tt-date').textContent = date;
-    document.getElementById('tt-vol').textContent = 'Volumen: ' + vol + 'kg';
-    document.getElementById('tt-rm').textContent = 'Est. 1RM: ' + rm + 'kg';
-    const cx = parseFloat(dot.getAttribute('cx'));
-    const scaleX = svgRect.width / 540;
-    const x = cx * scaleX;
-    vline.setAttribute('x1', cx); vline.setAttribute('x2', cx); vline.style.display = '';
-    tooltip.style.display = 'block';
-    const tLeft = x + 130 > svgRect.width ? x - 130 : x + 10;
-    tooltip.style.left = tLeft + 'px';
-    tooltip.style.top = '10px';
-  };
-
-  svg.querySelectorAll('.dot').forEach(dot => {
-    dot.style.cursor = 'pointer';
-    dot.addEventListener('mouseenter', e => {
-      dot.setAttribute('r', 7);
-      showTip(dot, svg.getBoundingClientRect());
-    });
-    dot.addEventListener('mouseleave', () => {
-      dot.setAttribute('r', 5);
-      tooltip.style.display = 'none';
-      vline.style.display = 'none';
-    });
-    dot.addEventListener('touchstart', e => {
-      e.preventDefault();
-      showTip(dot, svg.getBoundingClientRect());
-      setTimeout(() => { tooltip.style.display='none'; vline.style.display='none'; }, 2000);
-    });
+  svg.querySelectorAll('.dot').forEach(dot=>{
+    dot.style.cursor='pointer';
+    const show=()=>{
+      dot.setAttribute('r',7);
+      document.getElementById('tt-date').textContent=dot.dataset.date;
+      document.getElementById('tt-vol').textContent='Max vægt: '+dot.dataset.vol+'kg';
+      document.getElementById('tt-rm').textContent='Est. 1RM: '+dot.dataset.rm+'kg';
+      const cx=parseFloat(dot.getAttribute('cx'));
+      const sx=svg.getBoundingClientRect().width/540;
+      const x=cx*sx;
+      vl.setAttribute('x1',cx); vl.setAttribute('x2',cx); vl.style.display='';
+      tip.style.display='block';
+      tip.style.left=(x+130>svg.getBoundingClientRect().width?x-130:x+10)+'px';
+      tip.style.top='10px';
+    };
+    const hide=()=>{ dot.setAttribute('r',5); tip.style.display='none'; vl.style.display='none'; };
+    dot.addEventListener('mouseenter',show);
+    dot.addEventListener('mouseleave',hide);
+    dot.addEventListener('touchstart',e=>{ e.preventDefault(); show(); setTimeout(hide,2000); });
   });
 }
 
-// Init
+// ── Tabs ─────────────────────────────────────────────────────────
+function showTab(tab) {
+  ['log','templates','progress'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===tab?'':'none'; });
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['log','templates','progress'][i]===tab));
+  closeDD();
+  if (tab==='progress')  { renderExSelect(); renderProgress(); }
+  if (tab==='templates')   renderTemplates();
+  if (tab==='log')       { renderLog(); renderQuickTemplates(); updateStats(); }
+}
+
+// ── Init ──────────────────────────────────────────────────────────
 addSetRow();
 renderLog();
 updateStats();
-updateDatalist();
 renderQuickTemplates();
+// Open today's group by default
+if (workouts.length) { expandedDates.add(workouts[0].displayDate); renderLog(); }
 </script>
 </body>
 </html>
