@@ -119,6 +119,7 @@ svg.chart{display:block;width:100%;overflow:visible}
       <div class="stat"><div class="stat-label">Total volumen</div><div class="stat-value blue" id="total-vol">0 kg</div></div>
     </div>
     <div id="quick-templates"></div>
+    <div id="custom-exercises-section"></div>
     <div class="section-label">Ny øvelse</div>
     <div class="search-wrap">
       <input type="text" id="exercise-input" placeholder="Søg øvelse (fx Dødløft)..." oninput="onExInput(this.value)" autocomplete="off">
@@ -297,9 +298,31 @@ function assignCat(name, cat) {
   const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
   customCats[name] = cat;
   localStorage.setItem('wt_custom_cats', JSON.stringify(customCats));
-  // Add to EX_CAT so dropdown groups correctly
   EX_CAT[name] = cat;
   document.getElementById('cat-picker')?.remove();
+  renderCustomExercises();
+}
+function renderCustomExercises() {
+  const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
+  const el = document.getElementById('custom-exercises-section');
+  const names = Object.keys(customCats);
+  if (!names.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="section-label">Mine øvelser</div>`
+    + names.map(name => `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:#0f172a;border-radius:10px;padding:12px 14px;margin-bottom:6px;min-height:52px">
+        <div>
+          <div style="font-size:14px;font-weight:600">${name}</div>
+          <div style="font-size:11px;color:#64748b">${customCats[name]}</div>
+        </div>
+        <button style="background:#7f1d1d;color:#fca5a5;border:none;border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer;min-width:56px;min-height:44px;flex-shrink:0;margin-left:12px" onclick="deleteCustomEx('${name.replace(/'/g,"\\'")}')">Slet</button>
+      </div>`).join('');
+}
+function deleteCustomEx(name) {
+  const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
+  delete customCats[name];
+  localStorage.setItem('wt_custom_cats', JSON.stringify(customCats));
+  delete EX_CAT[name];
+  renderCustomExercises();
 }
 function addSetRow(reps='',weight='') {
   const c=document.getElementById('sets-container');
@@ -600,7 +623,7 @@ function showTab(tab) {
   closeDD();
   if (tab==='progress')  { renderExSelect(); renderProgress(); }
   if (tab==='templates')   renderTemplates();
-  if (tab==='log')       { renderLog(); renderQuickTemplates(); updateStats(); }
+  if (tab==='log')       { renderLog(); renderQuickTemplates(); renderCustomExercises(); updateStats(); }
 }
 
 // Load saved custom categories into EX_CAT on init
@@ -612,6 +635,7 @@ addSetRow();
 renderLog();
 updateStats();
 renderQuickTemplates();
+renderCustomExercises();
 // Open today's group by default
 if (workouts.length) { expandedDates.add(workouts[0].displayDate); renderLog(); }
 </script>
