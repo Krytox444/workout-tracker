@@ -23,7 +23,7 @@ h1{font-size:22px;font-weight:700;margin-bottom:14px;display:flex;align-items:ce
 /* Search + dropdown */
 .search-wrap{position:relative;margin-bottom:8px}
 .search-wrap input{margin-bottom:0}
-.dropdown{position:absolute;bottom:calc(100% + 4px);left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:10px;z-index:200;overflow:hidden;box-shadow:0 -8px 24px rgba(0,0,0,.5);display:none;max-height:220px;overflow-y:auto}
+.dropdown{position:absolute;top:calc(100% + 4px);left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:10px;z-index:200;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.5);display:none;max-height:220px;overflow-y:auto}
 .dropdown.show{display:block}
 .dd-cat{padding:5px 12px;font-size:10px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.05em;background:#0f172a;position:sticky;top:0}
 .dd-item{padding:10px 14px;cursor:pointer;font-size:14px}
@@ -242,6 +242,12 @@ function renderDD(ddId, query, onSelect) {
     `<div class="dd-cat">${cat}</div>`
     + exs.map(ex => `<div class="dd-item" onmousedown="event.preventDefault()" onclick="${onSelect}('${ex.replace(/'/g,"\\'")}')">${hl(ex,query)}</div>`).join('')
   ).join('');
+  // Add "create new" option if no exact match
+  const exactMatch = matches.some(({ex}) => ex.toLowerCase() === query.toLowerCase());
+  if (!exactMatch) {
+    dd.innerHTML += `<div class="dd-cat">Ny øvelse</div>
+      <div class="dd-item" style="color:#60a5fa" onmousedown="event.preventDefault()" onclick="${onSelect}('${query.replace(/'/g,"\\'")}')")>+ Opret "${query}"</div>`;
+  }
   dd.classList.add('show');
 }
 
