@@ -200,9 +200,17 @@ function fuzzyScore(str, q) {
   return (m/q.length)*35;
 }
 function getMatches(query, limit=8) {
+  const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
   const custom = workouts.map(w=>w.exercise).filter(e=>!ALL_EX.includes(e));
   const pool   = [...new Set([...ALL_EX,...custom])];
   if (!query) return pool.slice(0,limit).map(ex=>({ex,score:50}));
+
+  // Check if query matches a category name
+  const catMatch = Object.keys(EXERCISES).find(cat => fuzzyScore(cat, query) > 60);
+  if (catMatch) {
+    return EXERCISES[catMatch].map(ex=>({ex, score:95}));
+  }
+
   return pool.map(ex=>({ex,score:fuzzyScore(ex,query)}))
     .filter(x=>x.score>20).sort((a,b)=>b.score-a.score).slice(0,limit);
 }
@@ -250,8 +258,37 @@ function onExInput(val) {
   } else box.style.display='none';
 }
 function selectExercise(name) {
-  document.getElementById('exercise-input').value=name;
+  document.getElementById('exercise-input').value = name;
   closeDD(); onExInput(name);
+  // If custom exercise, ask for category
+  if (!ALL_EX.includes(name)) {
+    const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
+    if (!customCats[name]) showCatPicker(name);
+  }
+}
+
+function showCatPicker(name) {
+  const existing = document.getElementById('cat-picker');
+  if (existing) existing.remove();
+  const div = document.createElement('div');
+  div.id = 'cat-picker';
+  div.style.cssText = 'background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:8px';
+  div.innerHTML = `<p style="font-size:12px;color:#64748b;margin-bottom:8px">Hvilken kategori tilhører "<strong style="color:#fff">${name}</strong>"?</p>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${Object.keys(EXERCISES).map(cat =>
+        `<button class="btn-sm btn-secondary" onclick="assignCat('${name.replace(/'/g,"\\'")}','${cat}')">${cat}</button>`
+      ).join('')}
+    </div>`;
+  document.getElementById('hint-box').insertAdjacentElement('beforebegin', div);
+}
+
+function assignCat(name, cat) {
+  const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
+  customCats[name] = cat;
+  localStorage.setItem('wt_custom_cats', JSON.stringify(customCats));
+  // Add to EX_CAT so dropdown groups correctly
+  EX_CAT[name] = cat;
+  document.getElementById('cat-picker')?.remove();
 }
 function addSetRow(reps='',weight='') {
   const c=document.getElementById('sets-container');
@@ -554,6 +591,10 @@ function showTab(tab) {
   if (tab==='templates')   renderTemplates();
   if (tab==='log')       { renderLog(); renderQuickTemplates(); updateStats(); }
 }
+
+// Load saved custom categories into EX_CAT on init
+const savedCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
+Object.entries(savedCats).forEach(([ex, cat]) => EX_CAT[ex] = cat);
 
 // ── Init ──────────────────────────────────────────────────────────
 addSetRow();
