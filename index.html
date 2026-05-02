@@ -7,150 +7,184 @@
 <meta name="theme-color" content="#0f172a">
 <title>Workout Tracker</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:linear-gradient(135deg,#0f172a,#1e293b);min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#fff;padding:16px}
-  .container{max-width:600px;margin:0 auto}
-  .card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:20px;margin-bottom:16px}
-  h1{font-size:24px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
-  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
-  .tab{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:14px;transition:all .2s}
-  .tab.active{background:#2563eb;color:#fff}
-  .tab:not(.active){background:#334155;color:#94a3b8}
-  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
-  .stat{background:#334155;border-radius:12px;padding:16px}
-  .stat-label{font-size:12px;color:#94a3b8;margin-bottom:4px}
-  .stat-value{font-size:28px;font-weight:700}
-  .blue{color:#60a5fa} .green{color:#34d399} .orange{color:#fb923c} .red{color:#f87171} .yellow{color:#fbbf24}
-  input,select{width:100%;padding:12px;background:#334155;border:1px solid #475569;border-radius:8px;color:#fff;font-size:16px;margin-bottom:8px;outline:none}
-  input:focus,select:focus{border-color:#2563eb}
-  input::placeholder{color:#64748b}
-  .set-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
-  .set-row span{color:#94a3b8;font-weight:600;width:48px;font-size:14px;flex-shrink:0}
-  .set-row input{margin-bottom:0;flex:1}
-  .btn{width:100%;padding:12px;border:none;border-radius:8px;font-weight:600;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:8px}
-  .btn-primary{background:#2563eb;color:#fff} .btn-primary:hover{background:#1d4ed8}
-  .btn-secondary{background:#334155;color:#fff} .btn-secondary:hover{background:#475569}
-  .btn-danger{background:none;border:none;color:#f87171;cursor:pointer;padding:8px;border-radius:8px}
-  .workout-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:12px}
-  .workout-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
-  .workout-name{font-weight:600;font-size:18px}
-  .workout-date{font-size:12px;color:#64748b}
-  .set-line{color:#94a3b8;font-size:14px;margin-bottom:2px}
-  .workout-footer{display:flex;gap:16px;margin-top:8px;padding-top:8px;border-top:1px solid #334155}
-  .badge{font-size:13px;font-weight:600}
-  .last-session{background:#334155;border-radius:8px;padding:12px;margin-bottom:8px}
-  .last-session p{font-size:12px;color:#94a3b8;margin-bottom:4px}
-  .last-session span{font-size:13px;color:#cbd5e1}
-  /* Progress tab */
-  .exercise-card{background:#334155;border-radius:12px;padding:16px;margin-bottom:12px}
-  .exercise-card h3{font-size:18px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between}
-  .exercise-card h3 small{font-size:13px;color:#94a3b8;font-weight:400}
-  .progress-badge{display:flex;align-items:center;gap:8px;padding:10px;border-radius:8px;margin-bottom:12px;font-weight:600}
-  .progress-badge.good{background:rgba(16,185,129,.15);border:1px solid #059669}
-  .progress-badge.bad{background:rgba(234,179,8,.15);border:1px solid #ca8a04}
-  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-  .metric{background:#1e293b;border-radius:8px;padding:12px}
-  .metric-label{font-size:12px;color:#94a3b8;margin-bottom:4px}
-  .metric-value{font-size:22px;font-weight:700}
-  .metric-sub{font-size:12px;margin-top:2px}
-  /* SVG Chart */
-  .chart-wrap{width:100%;overflow-x:auto}
-  svg.chart{display:block;width:100%;height:180px}
-  .empty{text-align:center;padding:48px 0;color:#64748b}
-  .empty svg{margin:0 auto 12px;display:block;opacity:.4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f172a;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#fff;padding:12px}
+.container{max-width:600px;margin:0 auto}
+.card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:16px;margin-bottom:12px}
+h1{font-size:22px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.tabs{display:flex;gap:6px;margin-bottom:16px}
+.tab{flex:1;padding:9px 6px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:13px;transition:all .2s;text-align:center}
+.tab.active{background:#2563eb;color:#fff}
+.tab:not(.active){background:#334155;color:#94a3b8}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat{background:#0f172a;border-radius:10px;padding:12px}
+.stat-label{font-size:11px;color:#64748b;margin-bottom:2px}
+.stat-value{font-size:24px;font-weight:700}
+input,select,textarea{width:100%;padding:11px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:15px;margin-bottom:8px;outline:none;-webkit-appearance:none}
+input:focus,select:focus{border-color:#2563eb}
+input::placeholder{color:#475569}
+.set-row{display:grid;grid-template-columns:36px 1fr 1fr 32px;gap:6px;align-items:center;margin-bottom:6px}
+.set-row span{color:#64748b;font-size:12px;font-weight:600;text-align:center}
+.set-row input{margin-bottom:0}
+.btn{width:100%;padding:12px;border:none;border-radius:8px;font-weight:600;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s;margin-top:6px}
+.btn-primary{background:#2563eb;color:#fff}
+.btn-secondary{background:#334155;color:#cbd5e1}
+.btn-sm{padding:7px 12px;font-size:13px;border-radius:6px;border:none;cursor:pointer;font-weight:600}
+.btn-danger-icon{background:none;border:none;color:#475569;cursor:pointer;padding:4px;font-size:16px;line-height:1}
+/* Workout cards - compact mobile */
+.w-card{background:#1e293b;border:1px solid #334155;border-radius:12px;margin-bottom:8px;overflow:hidden}
+.w-card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer}
+.w-card-left{flex:1;min-width:0}
+.w-card-name{font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.w-card-meta{font-size:11px;color:#64748b;margin-top:2px}
+.w-card-stats{display:flex;gap:8px;align-items:center;flex-shrink:0;margin-left:8px}
+.chip{font-size:11px;font-weight:700;padding:3px 7px;border-radius:20px;white-space:nowrap}
+.chip-blue{background:#1e3a5f;color:#60a5fa}
+.chip-orange{background:#431407;color:#fb923c}
+.w-card-sets{padding:0 14px 12px;border-top:1px solid #0f172a}
+.sets-grid{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.set-chip{background:#0f172a;border-radius:6px;padding:5px 9px;font-size:12px;color:#94a3b8}
+.set-chip strong{color:#e2e8f0}
+.expand-icon{color:#475569;font-size:11px;margin-left:6px;transition:transform .2s}
+/* Templates */
+.template-card{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:8px}
+.template-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.template-name{font-weight:700;font-size:15px}
+.template-exercises{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.ex-tag{background:#1e3a5f;color:#60a5fa;padding:3px 8px;border-radius:20px;font-size:12px}
+.template-actions{display:flex;gap:6px}
+.hint-box{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px;margin-bottom:8px}
+.hint-box p{font-size:11px;color:#64748b;margin-bottom:5px}
+.hint-sets{display:flex;flex-wrap:wrap;gap:4px}
+.hint-chip{background:#1e293b;border-radius:5px;padding:3px 7px;font-size:12px;color:#94a3b8}
+/* Chart */
+.chart-container{position:relative;user-select:none}
+svg.chart{display:block;width:100%;overflow:visible}
+.tooltip{position:absolute;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:8px 10px;font-size:12px;pointer-events:none;display:none;min-width:120px;z-index:10}
+.tooltip-date{color:#64748b;margin-bottom:4px;font-size:11px}
+.tooltip-row{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.tooltip-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.empty{text-align:center;padding:40px 0;color:#475569}
+.blue{color:#60a5fa}.green{color:#34d399}.orange{color:#fb923c}.red{color:#f87171}
+.section-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="card">
-    <h1>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M6.5 6.5l11 11M17 7l1.5-1.5a2 2 0 0 1 2.83 2.83L19.83 9.8a2 2 0 0 1-2.83 0L17 9.63A2 2 0 0 1 17 7zM7 17l-1.5 1.5a2 2 0 0 1-2.83-2.83L4.17 14.2a2 2 0 0 1 2.83 0L7 14.37A2 2 0 0 1 7 17z"/></svg>
-      Workout Tracker
-    </h1>
-
-    <div class="tabs">
-      <button class="tab active" onclick="showTab('log')">📋 Log træning</button>
-      <button class="tab" onclick="showTab('progress')">📈 Progression</button>
-    </div>
-
-    <!-- LOG TAB -->
-    <div id="tab-log">
-      <div class="stats">
-        <div class="stat"><div class="stat-label">Total øvelser</div><div class="stat-value" id="total-count">0</div></div>
-        <div class="stat"><div class="stat-label">Total volumen</div><div class="stat-value blue" id="total-vol">0 kg</div></div>
-      </div>
-
-      <input type="text" id="exercise-input" placeholder="Øvelse (fx Bænkpres)" oninput="onExerciseInput(this.value)" list="exercise-list" autocomplete="off">
-      <datalist id="exercise-list"></datalist>
-
-      <div id="last-session-box" style="display:none" class="last-session">
-        <p>Sidst du trænede denne øvelse:</p>
-        <div id="last-session-sets"></div>
-      </div>
-
-      <div id="sets-container"></div>
-
-      <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
-      <button class="btn btn-primary" onclick="saveWorkout()">💾 Gem øvelse</button>
-    </div>
-
-    <!-- PROGRESS TAB -->
-    <div id="tab-progress" style="display:none">
-      <select id="exercise-select" onchange="renderProgress()">
-        <option value="">Vælg en øvelse...</option>
-      </select>
-      <div id="progress-content"></div>
-    </div>
+<div class="card">
+  <h1>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><path d="M6.5 6.5l11 11M17 7l1.5-1.5a2 2 0 0 1 2.83 2.83L19.83 9.8a2 2 0 0 1-2.83 0L17 9.63A2 2 0 0 1 17 7zM7 17l-1.5 1.5a2 2 0 0 1-2.83-2.83L4.17 14.2a2 2 0 0 1 2.83 0L7 14.37A2 2 0 0 1 7 17z"/></svg>
+    Workout Tracker
+  </h1>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('log')">📋 Log</button>
+    <button class="tab" onclick="showTab('templates')">📁 Templates</button>
+    <button class="tab" onclick="showTab('progress')">📈 Progression</button>
   </div>
 
-  <!-- WORKOUT LOG -->
-  <div id="workout-log"></div>
+  <!-- LOG -->
+  <div id="tab-log">
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Total øvelser</div><div class="stat-value" id="total-count">0</div></div>
+      <div class="stat"><div class="stat-label">Total volumen</div><div class="stat-value blue" id="total-vol">0 kg</div></div>
+    </div>
+    <div id="quick-templates"></div>
+    <div class="section-label">Ny øvelse</div>
+    <input type="text" id="exercise-input" placeholder="Øvelse (fx Bænkpres)" oninput="onExInput(this.value)" list="ex-list" autocomplete="off">
+    <datalist id="ex-list"></datalist>
+    <div id="hint-box" style="display:none" class="hint-box">
+      <p>Sidste session:</p>
+      <div class="hint-sets" id="hint-sets"></div>
+    </div>
+    <div class="set-row" style="margin-bottom:4px">
+      <span></span><span style="text-align:center;font-size:11px;color:#475569">REPS</span><span style="text-align:center;font-size:11px;color:#475569">KG</span><span></span>
+    </div>
+    <div id="sets-container"></div>
+    <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
+    <button class="btn btn-primary" onclick="saveWorkout()">💾 Gem øvelse</button>
+  </div>
+
+  <!-- TEMPLATES -->
+  <div id="tab-templates" style="display:none">
+    <div class="section-label">Gem nuværende workout som template</div>
+    <input type="text" id="tpl-name" placeholder="Template navn (fx Push Day)">
+    <div id="tpl-exercises-input">
+      <div id="tpl-ex-list"></div>
+      <input type="text" id="tpl-ex-input" placeholder="Tilføj øvelse..." list="ex-list" onkeydown="if(event.key==='Enter'){addTplEx()}">
+      <button class="btn btn-secondary" onclick="addTplEx()">+ Tilføj øvelse</button>
+    </div>
+    <button class="btn btn-primary" onclick="saveTemplate()" style="margin-top:4px">💾 Gem template</button>
+    <div style="margin-top:16px" id="template-list"></div>
+  </div>
+
+  <!-- PROGRESSION -->
+  <div id="tab-progress" style="display:none">
+    <select id="ex-select" onchange="renderProgress()">
+      <option value="">Vælg øvelse...</option>
+    </select>
+    <div id="progress-content"></div>
+  </div>
+</div>
+
+<div id="workout-log"></div>
 </div>
 
 <script>
-let workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+let workouts = JSON.parse(localStorage.getItem('wt_workouts') || '[]');
+let templates = JSON.parse(localStorage.getItem('wt_templates') || '[]');
 let setCount = 1;
+let tplExercises = [];
+let expandedCards = new Set();
 
-function save() { localStorage.setItem('workouts', JSON.stringify(workouts)); }
+const save = () => {
+  localStorage.setItem('wt_workouts', JSON.stringify(workouts));
+  localStorage.setItem('wt_templates', JSON.stringify(templates));
+};
 
-function calc1RM(w, r) { return r === 1 ? w : Math.round(w * (1 + r / 30)); }
-function calcVolume(sets) { return sets.reduce((s, x) => s + x.reps * x.weight, 0); }
-function getMax1RM(sets) { return Math.max(...sets.map(s => calc1RM(s.weight, s.reps))); }
+const calc1RM = (w, r) => r <= 0 ? w : Math.round(w * (1 + r / 30));
+const calcVol = sets => sets.reduce((s, x) => s + x.reps * x.weight, 0);
+const getMax1RM = sets => Math.max(...sets.map(s => calc1RM(s.weight, s.reps)));
 
 function showTab(tab) {
-  document.getElementById('tab-log').style.display = tab === 'log' ? '' : 'none';
-  document.getElementById('tab-progress').style.display = tab === 'progress' ? '' : 'none';
-  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (tab === 'log') === (i === 0)));
-  if (tab === 'progress') renderExerciseSelect();
-  if (tab === 'log') renderLog();
+  ['log','templates','progress'].forEach(t => {
+    document.getElementById('tab-'+t).style.display = t === tab ? '' : 'none';
+  });
+  document.querySelectorAll('.tab').forEach((el, i) => {
+    el.classList.toggle('active', ['log','templates','progress'][i] === tab);
+  });
+  if (tab === 'progress') { renderExSelect(); renderProgress(); }
+  if (tab === 'templates') renderTemplates();
+  if (tab === 'log') { renderLog(); renderQuickTemplates(); }
 }
 
-function addSetRow(reps = '', weight = '') {
+function addSetRow(reps='', weight='') {
   const c = document.getElementById('sets-container');
-  const div = document.createElement('div');
-  div.className = 'set-row';
-  div.innerHTML = `<span>Set ${setCount++}</span>
-    <input type="number" placeholder="Reps" value="${reps}" min="1">
-    <input type="number" placeholder="Kg" value="${weight}" min="0" step="0.5">
-    <button class="btn-danger" onclick="this.parentNode.remove(); renumberSets()">✕</button>`;
-  c.appendChild(div);
+  const n = setCount++;
+  const d = document.createElement('div');
+  d.className = 'set-row';
+  d.dataset.n = n;
+  d.innerHTML = `<span style="color:#64748b;font-size:12px;font-weight:600;text-align:center">${n}</span>
+    <input type="number" placeholder="0" value="${reps}" min="1" inputmode="numeric">
+    <input type="number" placeholder="0" value="${weight}" min="0" step="0.5" inputmode="decimal">
+    <button class="btn-danger-icon" onclick="this.parentNode.remove();renumberSets()">✕</button>`;
+  c.appendChild(d);
 }
 
 function renumberSets() {
-  document.querySelectorAll('#sets-container .set-row span').forEach((s, i) => s.textContent = `Set ${i + 1}`);
+  document.querySelectorAll('#sets-container .set-row').forEach((r, i) => {
+    r.querySelector('span').textContent = i + 1;
+  });
   setCount = document.querySelectorAll('#sets-container .set-row').length + 1;
 }
 
-function onExerciseInput(val) {
+function onExInput(val) {
   const last = workouts.find(w => w.exercise.toLowerCase() === val.toLowerCase());
-  const box = document.getElementById('last-session-box');
+  const box = document.getElementById('hint-box');
   if (last) {
     box.style.display = '';
-    document.getElementById('last-session-sets').innerHTML = last.sets.map((s, i) =>
-      `<span>Set ${i + 1}: ${s.reps} reps @ ${s.weight}kg</span><br>`).join('');
-  } else {
-    box.style.display = 'none';
-  }
+    document.getElementById('hint-sets').innerHTML = last.sets.map(s =>
+      `<span class="hint-chip">${s.reps}×${s.weight}kg</span>`).join('');
+  } else box.style.display = 'none';
 }
 
 function saveWorkout() {
@@ -159,21 +193,18 @@ function saveWorkout() {
   const rows = document.querySelectorAll('#sets-container .set-row');
   const sets = [];
   rows.forEach(row => {
-    const inputs = row.querySelectorAll('input');
-    const r = parseInt(inputs[0].value), w = parseFloat(inputs[1].value);
-    if (r && w) sets.push({ reps: r, weight: w });
+    const [inp1, inp2] = row.querySelectorAll('input');
+    const r = parseInt(inp1.value), w = parseFloat(inp2.value);
+    if (r > 0 && w > 0) sets.push({ reps: r, weight: w });
   });
   if (!sets.length) return alert('Tilføj mindst ét set!');
   workouts.unshift({ id: Date.now(), exercise: ex, sets, date: new Date().toISOString(), displayDate: new Date().toLocaleDateString('da-DK') });
   save();
   document.getElementById('exercise-input').value = '';
+  document.getElementById('hint-box').style.display = 'none';
   document.getElementById('sets-container').innerHTML = '';
-  document.getElementById('last-session-box').style.display = 'none';
-  setCount = 1;
-  addSetRow();
-  renderLog();
-  updateStats();
-  updateDatalist();
+  setCount = 1; addSetRow();
+  renderLog(); updateStats(); updateDatalist();
 }
 
 function deleteWorkout(id) {
@@ -181,131 +212,275 @@ function deleteWorkout(id) {
   save(); renderLog(); updateStats();
 }
 
+function toggleCard(id) {
+  if (expandedCards.has(id)) expandedCards.delete(id);
+  else expandedCards.add(id);
+  renderLog();
+}
+
 function renderLog() {
   const el = document.getElementById('workout-log');
-  if (!workouts.length) { el.innerHTML = '<div class="empty"><p>Ingen øvelser endnu. Start dit workout! 💪</p></div>'; return; }
-  el.innerHTML = workouts.map(w => `
-    <div class="workout-item">
-      <div class="workout-header">
-        <div>
-          <div class="workout-name">${w.exercise}</div>
-          <div class="workout-date">${w.displayDate}</div>
+  if (!workouts.length) { el.innerHTML = '<div class="empty">Ingen øvelser endnu 💪</div>'; return; }
+  el.innerHTML = workouts.map(w => {
+    const expanded = expandedCards.has(w.id);
+    const setsChips = w.sets.map((s,i) => `<span class="set-chip"><strong>S${i+1}</strong> ${s.reps}×${s.weight}kg</span>`).join('');
+    return `<div class="w-card">
+      <div class="w-card-header" onclick="toggleCard(${w.id})">
+        <div class="w-card-left">
+          <div class="w-card-name">${w.exercise}</div>
+          <div class="w-card-meta">${w.displayDate} · ${w.sets.length} sets</div>
         </div>
-        <button class="btn-danger" onclick="deleteWorkout(${w.id})">🗑</button>
+        <div class="w-card-stats">
+          <span class="chip chip-blue">${calcVol(w.sets)}kg</span>
+          <span class="chip chip-orange">1RM ${getMax1RM(w.sets)}kg</span>
+          <button class="btn-danger-icon" onclick="event.stopPropagation();deleteWorkout(${w.id})">🗑</button>
+          <span class="expand-icon" style="transform:rotate(${expanded?'180':'0'}deg)">▼</span>
+        </div>
       </div>
-      ${w.sets.map((s, i) => `<div class="set-line">Set ${i + 1}: ${s.reps} reps @ ${s.weight}kg</div>`).join('')}
-      <div class="workout-footer">
-        <span class="badge blue">Volumen: ${calcVolume(w.sets)}kg</span>
-        <span class="badge orange">Est. 1RM: ${getMax1RM(w.sets)}kg</span>
-      </div>
-    </div>`).join('');
+      ${expanded ? `<div class="w-card-sets"><div class="sets-grid">${setsChips}</div></div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function updateStats() {
   document.getElementById('total-count').textContent = workouts.length;
-  document.getElementById('total-vol').textContent = workouts.reduce((s, w) => s + calcVolume(w.sets), 0) + ' kg';
+  document.getElementById('total-vol').textContent = workouts.reduce((s, w) => s + calcVol(w.sets), 0) + ' kg';
 }
 
 function updateDatalist() {
   const exercises = [...new Set(workouts.map(w => w.exercise))];
-  document.getElementById('exercise-list').innerHTML = exercises.map(e => `<option value="${e}">`).join('');
+  document.getElementById('ex-list').innerHTML = exercises.map(e => `<option value="${e}">`).join('');
 }
 
-function renderExerciseSelect() {
+// Templates
+let tplExList = [];
+function addTplEx() {
+  const inp = document.getElementById('tpl-ex-input');
+  const v = inp.value.trim();
+  if (!v) return;
+  tplExList.push(v);
+  inp.value = '';
+  renderTplExList();
+}
+function renderTplExList() {
+  document.getElementById('tpl-ex-list').innerHTML = tplExList.map((e,i) =>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#0f172a;border-radius:7px;margin-bottom:5px">
+      <span style="font-size:14px">${e}</span>
+      <button class="btn-danger-icon" onclick="tplExList.splice(${i},1);renderTplExList()">✕</button>
+    </div>`).join('');
+}
+function saveTemplate() {
+  const name = document.getElementById('tpl-name').value.trim();
+  if (!name || !tplExList.length) return alert('Udfyld navn og tilføj øvelser');
+  templates.unshift({ id: Date.now(), name, exercises: [...tplExList] });
+  save();
+  document.getElementById('tpl-name').value = '';
+  tplExList = [];
+  renderTplExList();
+  renderTemplates();
+  renderQuickTemplates();
+}
+function deleteTemplate(id) {
+  templates = templates.filter(t => t.id !== id);
+  save(); renderTemplates(); renderQuickTemplates();
+}
+function loadTemplate(id) {
+  const tpl = templates.find(t => t.id === id);
+  if (!tpl) return;
+  showTab('log');
+  document.getElementById('exercise-input').value = tpl.exercises[0] || '';
+  onExInput(tpl.exercises[0] || '');
+}
+function renderTemplates() {
+  const el = document.getElementById('template-list');
+  if (!templates.length) { el.innerHTML = '<div class="empty" style="padding:20px 0">Ingen templates endnu</div>'; return; }
+  el.innerHTML = '<div class="section-label">Gemte templates</div>' + templates.map(t => `
+    <div class="template-card">
+      <div class="template-header">
+        <span class="template-name">${t.name}</span>
+        <button class="btn-danger-icon" onclick="deleteTemplate(${t.id})">🗑</button>
+      </div>
+      <div class="template-exercises">${t.exercises.map(e => `<span class="ex-tag">${e}</span>`).join('')}</div>
+      <div class="template-actions">
+        ${t.exercises.map(e => `<button class="btn-sm btn-secondary" onclick="loadEx('${e.replace(/'/g,"\\'")}')">+ ${e}</button>`).join('')}
+      </div>
+    </div>`).join('');
+}
+function loadEx(ex) {
+  showTab('log');
+  document.getElementById('exercise-input').value = ex;
+  onExInput(ex);
+}
+function renderQuickTemplates() {
+  const el = document.getElementById('quick-templates');
+  if (!templates.length) { el.innerHTML = ''; return; }
+  el.innerHTML = `<div class="section-label">Templates</div>
+    <div style="display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:10px">
+      ${templates.map(t => `<button class="btn-sm btn-secondary" style="flex-shrink:0;white-space:nowrap" onclick="showTemplateOptions(${t.id})">${t.name}</button>`).join('')}
+    </div>
+    <div id="tpl-options"></div>`;
+}
+function showTemplateOptions(id) {
+  const tpl = templates.find(t => t.id === id);
+  if (!tpl) return;
+  document.getElementById('tpl-options').innerHTML = `
+    <div style="background:#0f172a;border-radius:8px;padding:10px;margin-bottom:10px">
+      <div style="font-size:12px;color:#64748b;margin-bottom:6px">${tpl.name} – vælg øvelse:</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">
+        ${tpl.exercises.map(e => `<button class="btn-sm btn-primary" onclick="loadEx('${e.replace(/'/g,"\\'")}')">+ ${e}</button>`).join('')}
+      </div>
+    </div>`;
+}
+
+// Progression
+function renderExSelect() {
   const exercises = [...new Set(workouts.map(w => w.exercise))];
-  const sel = document.getElementById('exercise-select');
-  const current = sel.value;
-  sel.innerHTML = '<option value="">Vælg en øvelse...</option>' + exercises.map(e => `<option value="${e}" ${e === current ? 'selected' : ''}>${e}</option>`).join('');
-  if (current) renderProgress();
+  const sel = document.getElementById('ex-select');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">Vælg øvelse...</option>' + exercises.map(e => `<option ${e===cur?'selected':''} value="${e}">${e}</option>`).join('');
 }
-
 function renderProgress() {
-  const ex = document.getElementById('exercise-select').value;
+  const ex = document.getElementById('ex-select').value;
   const el = document.getElementById('progress-content');
   if (!ex) { el.innerHTML = ''; return; }
-
   const sessions = workouts.filter(w => w.exercise === ex).reverse();
-  if (sessions.length < 1) { el.innerHTML = '<div class="empty">Ingen data endnu</div>'; return; }
+  if (!sessions.length) { el.innerHTML = '<div class="empty">Ingen data</div>'; return; }
 
-  // Overload vs previous session
   let overloadHTML = '';
   if (sessions.length >= 2) {
-    const latest = sessions[sessions.length - 1];
-    const prev = sessions[sessions.length - 2];
-    const volChange = calcVolume(latest.sets) - calcVolume(prev.sets);
-    const rmChange = getMax1RM(latest.sets) - getMax1RM(prev.sets);
-    const progressing = volChange > 0 || rmChange > 0;
+    const latest = sessions[sessions.length-1], prev = sessions[sessions.length-2];
+    const vDiff = calcVol(latest.sets) - calcVol(prev.sets);
+    const rDiff = getMax1RM(latest.sets) - getMax1RM(prev.sets);
+    const prog = vDiff > 0 || rDiff > 0;
     overloadHTML = `
-      <div class="progress-badge ${progressing ? 'good' : 'bad'}">
-        ${progressing ? '🏆 Du progresserer!' : '⚠️ Ingen fremgang siden sidst'}
+      <div style="display:flex;align-items:center;gap:8px;padding:10px;border-radius:8px;margin-bottom:10px;font-weight:600;font-size:14px;${prog?'background:rgba(16,185,129,.12);border:1px solid #059669':'background:rgba(234,179,8,.1);border:1px solid #ca8a04'}">
+        ${prog ? '🏆 Du progresserer!' : '⚠️ Ingen fremgang siden sidst'}
       </div>
-      <div class="metrics">
-        <div class="metric">
-          <div class="metric-label">Volumen ændring</div>
-          <div class="metric-value ${volChange >= 0 ? 'green' : 'red'}">${volChange >= 0 ? '+' : ''}${volChange}kg</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Styrke (1RM)</div>
-          <div class="metric-value ${rmChange >= 0 ? 'green' : 'red'}">${rmChange >= 0 ? '+' : ''}${rmChange}kg</div>
-        </div>
+      <div class="stats" style="margin-bottom:10px">
+        <div class="stat"><div class="stat-label">Volumen ændring</div><div class="stat-value ${vDiff>=0?'green':'red'}">${vDiff>=0?'+':''}${vDiff}kg</div></div>
+        <div class="stat"><div class="stat-label">Styrke (est. 1RM)</div><div class="stat-value ${rDiff>=0?'green':'red'}">${rDiff>=0?'+':''}${rDiff}kg</div></div>
       </div>`;
   }
 
-  // SVG chart
-  const data = sessions.map(s => ({ date: s.displayDate, vol: calcVolume(s.sets), rm: getMax1RM(s.sets) }));
-  const chartHTML = sessions.length >= 2 ? drawChart(data) : '<p style="color:#64748b;font-size:13px;margin-top:8px">Log mindst 2 sessions for at se graf</p>';
-
-  el.innerHTML = `<div class="exercise-card">
-    <h3>${ex} <small>${sessions.length} sessions</small></h3>
+  el.innerHTML = `<div style="margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:16px;font-weight:700">${ex}</span>
+      <span style="font-size:12px;color:#64748b">${sessions.length} sessions</span>
+    </div>
     ${overloadHTML}
-    <div class="metric-label" style="margin-bottom:8px">Progression over tid</div>
-    ${chartHTML}
+    ${sessions.length >= 2 ? drawChart(sessions) : '<p style="color:#64748b;font-size:13px">Log mindst 2 sessions for graf</p>'}
+  </div>`;
+
+  if (sessions.length >= 2) initChartInteraction();
+}
+
+function drawChart(sessions) {
+  const data = sessions.map(s => ({
+    date: s.displayDate, vol: calcVol(s.sets), rm: getMax1RM(s.sets)
+  }));
+  const n = data.length;
+  const W = 540, H = 200;
+  const PAD = {t:20, r:50, b:35, l:50};
+  const iW = W - PAD.l - PAD.r, iH = H - PAD.t - PAD.b;
+
+  const vols = data.map(d => d.vol);
+  const rms = data.map(d => d.rm);
+  const vMin = Math.min(...vols)*0.9, vMax = Math.max(...vols)*1.1;
+  const rMin = Math.min(...rms)*0.9, rMax = Math.max(...rms)*1.1;
+
+  const xOf = i => PAD.l + (i/(n-1||1))*iW;
+  const yOfV = v => PAD.t + iH - ((v-vMin)/(vMax-vMin||1))*iH;
+  const yOfR = v => PAD.t + iH - ((v-rMin)/(rMax-rMin||1))*iH;
+
+  const volPts = data.map((d,i) => `${xOf(i)},${yOfV(d.vol)}`).join(' ');
+  const rmPts  = data.map((d,i) => `${xOf(i)},${yOfR(d.rm)}`).join(' ');
+
+  // Y axis labels left (volume) and right (1RM)
+  const yLabels = (min, max, side) => [0,0.5,1].map(t => {
+    const v = Math.round(min + t*(max-min));
+    const y = PAD.t + iH*(1-t);
+    const x = side==='left' ? PAD.l-6 : W-PAD.r+6;
+    const anchor = side==='left' ? 'end' : 'start';
+    return `<text x="${x}" y="${y+4}" text-anchor="${anchor}" fill="${side==='left'?'#34d399':'#fb923c'}" font-size="10">${v}</text>`;
+  }).join('');
+
+  // X labels (max 5)
+  const step = Math.max(1, Math.ceil(n/5));
+  const xLabels = data.map((d,i) => {
+    if (i % step !== 0 && i !== n-1) return '';
+    return `<text x="${xOf(i)}" y="${H-6}" text-anchor="middle" fill="#64748b" font-size="10">${d.date.slice(0,5)}</text>`;
+  }).join('');
+
+  // Dots with data attrs
+  const vDots = data.map((d,i) => `<circle class="dot" cx="${xOf(i)}" cy="${yOfV(d.vol)}" r="5" fill="#34d399" data-i="${i}" data-date="${d.date}" data-vol="${d.vol}" data-rm="${d.rm}"/>`).join('');
+  const rDots = data.map((d,i) => `<circle class="dot" cx="${xOf(i)}" cy="${yOfR(d.rm)}" r="5" fill="#fb923c" data-i="${i}" data-date="${d.date}" data-vol="${d.vol}" data-rm="${d.rm}"/>`).join('');
+
+  // Vertical guideline (hidden initially)
+  const vLine = `<line id="chart-vline" x1="0" y1="${PAD.t}" x2="0" y2="${PAD.t+iH}" stroke="#334155" stroke-width="1" stroke-dasharray="4" style="display:none"/>`;
+
+  return `<div class="chart-container" id="chart-wrap">
+    <div class="tooltip" id="chart-tooltip">
+      <div class="tooltip-date" id="tt-date"></div>
+      <div class="tooltip-row"><span class="tooltip-dot" style="background:#34d399"></span><span id="tt-vol"></span></div>
+      <div class="tooltip-row"><span class="tooltip-dot" style="background:#fb923c"></span><span id="tt-rm"></span></div>
+    </div>
+    <svg class="chart" viewBox="0 0 ${W} ${H}" id="main-chart">
+      ${[0,0.5,1].map(t=>`<line x1="${PAD.l}" y1="${PAD.t+iH*(1-t)}" x2="${W-PAD.r}" y2="${PAD.t+iH*(1-t)}" stroke="#1e293b" stroke-width="1"/>`).join('')}
+      ${vLine}
+      ${yLabels(vMin,vMax,'left')}${yLabels(rMin,rMax,'right')}${xLabels}
+      <text x="${PAD.l-6}" y="${PAD.t-6}" text-anchor="end" fill="#34d399" font-size="10">Vol</text>
+      <text x="${W-PAD.r+6}" y="${PAD.t-6}" text-anchor="start" fill="#fb923c" font-size="10">1RM</text>
+      <polyline points="${volPts}" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      <polyline points="${rmPts}" fill="none" stroke="#fb923c" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${vDots}${rDots}
+    </svg>
+    <div style="display:flex;gap:14px;justify-content:center;margin-top:6px">
+      <span style="font-size:12px;color:#34d399">● Volumen (kg)</span>
+      <span style="font-size:12px;color:#fb923c">● Est. 1RM (kg)</span>
+    </div>
   </div>`;
 }
 
-function drawChart(data) {
-  const W = 560, H = 160, PAD = { t: 10, r: 20, b: 30, l: 45 };
-  const iW = W - PAD.l - PAD.r, iH = H - PAD.t - PAD.b;
-  const vols = data.map(d => d.vol), rms = data.map(d => d.rm);
-  const allVals = [...vols, ...rms];
-  const minV = Math.min(...allVals) * 0.9, maxV = Math.max(...allVals) * 1.1;
-  const xStep = iW / (data.length - 1 || 1);
-  const yScale = v => iH - ((v - minV) / (maxV - minV || 1)) * iH;
-  const pts = (arr) => arr.map((v, i) => `${PAD.l + i * xStep},${PAD.t + yScale(v)}`).join(' ');
-  const n = data.length;
-  // Y axis labels
-  const yLabels = [minV, (minV + maxV) / 2, maxV].map(v => Math.round(v));
-  const yLabelHTML = yLabels.map((v, i) => {
-    const y = PAD.t + iH - (i / 2) * iH;
-    return `<text x="${PAD.l - 6}" y="${y + 4}" text-anchor="end" fill="#64748b" font-size="11">${v}</text>`;
-  }).join('');
-  // X axis labels (show max 5)
-  const step = Math.max(1, Math.floor(n / 5));
-  const xLabelHTML = data.filter((_, i) => i % step === 0 || i === n - 1).map((d, i, arr) => {
-    const origIdx = data.indexOf(d);
-    const x = PAD.l + origIdx * xStep;
-    const label = d.date.slice(0, 5); // dd/mm
-    return `<text x="${x}" y="${H - 6}" text-anchor="middle" fill="#64748b" font-size="10">${label}</text>`;
-  }).join('');
+function initChartInteraction() {
+  const svg = document.getElementById('main-chart');
+  const tooltip = document.getElementById('chart-tooltip');
+  const vline = document.getElementById('chart-vline');
+  if (!svg) return;
 
-  return `<div class="chart-wrap">
-  <svg class="chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-    <!-- grid -->
-    ${[0, 0.5, 1].map(t => `<line x1="${PAD.l}" y1="${PAD.t + iH * (1 - t)}" x2="${PAD.l + iW}" y2="${PAD.t + iH * (1 - t)}" stroke="#334155" stroke-width="1"/>`).join('')}
-    <!-- axes labels -->
-    ${yLabelHTML}${xLabelHTML}
-    <!-- volume line -->
-    <polyline points="${pts(vols)}" fill="none" stroke="#34d399" stroke-width="2" stroke-linejoin="round"/>
-    ${vols.map((v, i) => `<circle cx="${PAD.l + i * xStep}" cy="${PAD.t + yScale(v)}" r="4" fill="#34d399"/>`).join('')}
-    <!-- 1RM line -->
-    <polyline points="${pts(rms)}" fill="none" stroke="#fb923c" stroke-width="2" stroke-linejoin="round"/>
-    ${rms.map((v, i) => `<circle cx="${PAD.l + i * xStep}" cy="${PAD.t + yScale(v)}" r="4" fill="#fb923c"/>`).join('')}
-    <!-- legend -->
-    <rect x="${PAD.l}" y="${PAD.t}" width="10" height="10" rx="2" fill="#34d399"/>
-    <text x="${PAD.l + 14}" y="${PAD.t + 9}" fill="#94a3b8" font-size="11">Volumen (kg)</text>
-    <rect x="${PAD.l + 100}" y="${PAD.t}" width="10" height="10" rx="2" fill="#fb923c"/>
-    <text x="${PAD.l + 114}" y="${PAD.t + 9}" fill="#94a3b8" font-size="11">Est. 1RM (kg)</text>
-  </svg></div>`;
+  const showTip = (dot, svgRect) => {
+    const date = dot.dataset.date;
+    const vol = dot.dataset.vol;
+    const rm = dot.dataset.rm;
+    document.getElementById('tt-date').textContent = date;
+    document.getElementById('tt-vol').textContent = 'Volumen: ' + vol + 'kg';
+    document.getElementById('tt-rm').textContent = 'Est. 1RM: ' + rm + 'kg';
+    const cx = parseFloat(dot.getAttribute('cx'));
+    const scaleX = svgRect.width / 540;
+    const x = cx * scaleX;
+    vline.setAttribute('x1', cx); vline.setAttribute('x2', cx); vline.style.display = '';
+    tooltip.style.display = 'block';
+    const tLeft = x + 130 > svgRect.width ? x - 130 : x + 10;
+    tooltip.style.left = tLeft + 'px';
+    tooltip.style.top = '10px';
+  };
+
+  svg.querySelectorAll('.dot').forEach(dot => {
+    dot.style.cursor = 'pointer';
+    dot.addEventListener('mouseenter', e => {
+      dot.setAttribute('r', 7);
+      showTip(dot, svg.getBoundingClientRect());
+    });
+    dot.addEventListener('mouseleave', () => {
+      dot.setAttribute('r', 5);
+      tooltip.style.display = 'none';
+      vline.style.display = 'none';
+    });
+    dot.addEventListener('touchstart', e => {
+      e.preventDefault();
+      showTip(dot, svg.getBoundingClientRect());
+      setTimeout(() => { tooltip.style.display='none'; vline.style.display='none'; }, 2000);
+    });
+  });
 }
 
 // Init
@@ -313,6 +488,7 @@ addSetRow();
 renderLog();
 updateStats();
 updateDatalist();
+renderQuickTemplates();
 </script>
 </body>
 </html>
