@@ -133,7 +133,7 @@ svg.chart{display:block;width:100%;overflow:visible}
     </div>
     <div id="sets-container"></div>
     <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
-    <button class="btn btn-primary" onclick="saveWorkout()">💾 Gem øvelse</button>
+    <button class="btn btn-primary" onclick="saveWorkout()">💾 Log set</button>
   </div>
 
   <!-- TEMPLATES -->
@@ -248,9 +248,9 @@ function renderDD(ddId, query, onSelect) {
     `<div class="dd-cat">${cat}</div>`
     + exs.map(ex => `<div class="dd-item" onmousedown="event.preventDefault()" onclick="${onSelect}('${ex.replace(/'/g,"\\'")}')">${hl(ex,query)}</div>`).join('')
   ).join('');
-  // Add "create new" option if no exact match
+  // Add "create new" option only in the log dropdown
   const exactMatch = matches.some(({ex}) => ex.toLowerCase() === query.toLowerCase());
-  if (!exactMatch) {
+  if (!exactMatch && ddId === 'ex-dd') {
     dd.innerHTML += `<div class="dd-cat">Ny øvelse</div>
       <div class="dd-item" style="color:#60a5fa" onmousedown="event.preventDefault()" onclick="${onSelect}('${query.replace(/'/g,"\\'")}')")>+ Opret "${query}"</div>`;
   }
@@ -258,7 +258,7 @@ function renderDD(ddId, query, onSelect) {
 }
 
 // ── Log ──────────────────────────────────────────────────────────
-let setCount=1, expandedDates=new Set(), expandedCards=new Set();
+let setCount=1, expandedDates=new Set(), expandedCards=new Set(), editingCards=new Set();
 
 function onExInput(val) {
   renderDD('ex-dd', val, 'selectExercise');
@@ -368,6 +368,24 @@ function saveWorkout() {
 function deleteWorkout(id) {
   workouts=workouts.filter(w=>w.id!==id); save(); renderLog(); updateStats();
 }
+function startEditWorkout(id) {
+  editingCards.add(id); expandedCards.add(id); renderLog();
+}
+function cancelEditWorkout(id) {
+  editingCards.delete(id); renderLog();
+}
+function saveEditWorkout(id) {
+  const w=workouts.find(x=>x.id===id); if (!w) return;
+  const setsMap={};
+  document.querySelectorAll(`[data-edit-id="${id}"]`).forEach(inp=>{
+    const i=inp.dataset.idx;
+    if (!setsMap[i]) setsMap[i]={};
+    setsMap[i][inp.dataset.field]=inp.dataset.field==='reps'?parseInt(inp.value):parseFloat(inp.value);
+  });
+  const newSets=Object.values(setsMap).filter(s=>s.reps>0&&s.weight>0);
+  if (!newSets.length) return alert('Tilføj mindst ét set!');
+  w.sets=newSets; save(); editingCards.delete(id); renderLog(); updateStats();
+}
 function toggleDate(date) {
   expandedDates.has(date)?expandedDates.delete(date):expandedDates.add(date); renderLog();
 }
@@ -384,6 +402,7 @@ function renderLog() {
     const totalVol=ws.reduce((s,w)=>s+calcVol(w.sets),0);
     const cards=ws.map(w=>{
       const open=expandedCards.has(w.id);
+      const editing=editingCards.has(w.id);
       return `<div class="w-card">
         <div class="w-card-header" onclick="toggleCard(${w.id})">
           <div class="w-card-left">
@@ -393,11 +412,27 @@ function renderLog() {
           <div class="w-card-right">
             <span class="chip chip-blue">${calcVol(w.sets)}kg</span>
             <span class="chip chip-orange">1RM ${getMax1RM(w.sets)}kg</span>
+            <button class="btn-icon" onclick="event.stopPropagation();startEditWorkout(${w.id})" title="Rediger">✏️</button>
             <button class="btn-del" onclick="event.stopPropagation();deleteWorkout(${w.id})">🗑</button>
             <span class="expand-icon" style="transform:rotate(${open?'180':'0'}deg)">▼</span>
           </div>
         </div>
-        ${open?`<div class="sets-grid">${w.sets.map((s,i)=>`<span class="set-chip"><strong>S${i+1}</strong> ${s.reps}×${s.weight}kg</span>`).join('')}</div>`:''}</div>`;
+        ${open?(editing?`
+          <div style="padding:8px 12px 12px">
+            ${w.sets.map((s,i)=>`
+              <div class="set-row" style="margin-bottom:6px">
+                <span style="color:#64748b;font-size:12px;font-weight:600;text-align:center">${i+1}</span>
+                <input type="number" value="${s.reps}" min="1" inputmode="numeric" data-edit-id="${w.id}" data-idx="${i}" data-field="reps">
+                <input type="number" value="${s.weight}" min="0" step="0.5" inputmode="decimal" data-edit-id="${w.id}" data-idx="${i}" data-field="weight">
+                <span></span>
+              </div>`).join('')}
+            <div style="display:flex;gap:6px;margin-top:4px">
+              <button class="btn btn-primary" style="margin-top:0" onclick="saveEditWorkout(${w.id})">Gem</button>
+              <button class="btn btn-secondary" style="margin-top:0" onclick="cancelEditWorkout(${w.id})">Annuller</button>
+            </div>
+          </div>`
+        :`<div class="sets-grid">${w.sets.map((s,i)=>`<span class="set-chip"><strong>S${i+1}</strong> ${s.reps}×${s.weight}kg</span>`).join('')}</div>`)
+        :''}</div>`;
     }).join('');
     return `<div class="date-group">
       <div class="date-header" onclick="toggleDate('${date}')">
@@ -506,7 +541,14 @@ function renderQuickTemplates() {
       ${templates.map(t=>`<button class="btn-sm btn-secondary" style="flex-shrink:0;white-space:nowrap" onclick="showTplOptions(${t.id})">${t.name}</button>`).join('')}
     </div><div id="tpl-options"></div>`;
 }
+let activeTplId = null;
 function showTplOptions(id) {
+  if (activeTplId === id) {
+    activeTplId = null;
+    document.getElementById('tpl-options').innerHTML = '';
+    return;
+  }
+  activeTplId = id;
   const tpl=templates.find(t=>t.id===id); if (!tpl) return;
   document.getElementById('tpl-options').innerHTML=`
     <div style="background:#0f172a;border-radius:8px;padding:10px;margin-bottom:10px">
