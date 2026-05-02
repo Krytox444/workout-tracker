@@ -138,7 +138,7 @@ svg.chart{display:block;width:100%;overflow:visible}
       <div id="bw-info-content"></div>
     </div>
     <div class="set-row" style="margin-bottom:4px">
-      <span></span><span style="font-size:11px;color:#475569;text-align:center">REPS</span><span id="kg-label" style="font-size:11px;color:#475569;text-align:center">KG</span><span></span>
+      <span></span><span id="reps-label" style="font-size:11px;color:#475569;text-align:center">REPS</span><span id="kg-label" style="font-size:11px;color:#475569;text-align:center">KG</span><span></span>
     </div>
     <div id="sets-container"></div>
     <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
@@ -213,6 +213,8 @@ const EX_CAT = {};
 Object.entries(EXERCISES).forEach(([cat, exs]) => exs.forEach(e => EX_CAT[e] = cat));
 
 const BW_EXERCISES = new Set(['Pull-ups','Chin-ups','Dips','Push-ups','Diamond Push-ups','Planke','Crunches','Leg Raises','Russian Twist','Ab Rollout','Hanging Leg Raise','Side Planke','Step-ups']);
+const CARDIO_EXERCISES = new Set(['Løb','Cykling','Roning','Jump Rope','Assault Bike','Svømning']);
+let isCardioMode = false;
 
 function getSettings() { return JSON.parse(localStorage.getItem('wt_settings') || '{}'); }
 function openSettings() {
@@ -232,24 +234,31 @@ function saveSettings() {
   closeSettings();
   updateBWInfo(document.getElementById('exercise-input').value.trim());
 }
-function updateBWInfo(exName) {
-  const isBW=BW_EXERCISES.has(exName);
-  const box=document.getElementById('bw-info');
-  const lbl=document.getElementById('kg-label');
-  if (!isBW) { box.style.display='none'; lbl.textContent='KG'; return; }
+function updateExerciseMode(exName) {
+  const isBW    = BW_EXERCISES.has(exName);
+  const isCardio= CARDIO_EXERCISES.has(exName);
+  isCardioMode  = isCardio;
+  const box  = document.getElementById('bw-info');
+  const rLbl = document.getElementById('reps-label');
+  const kLbl = document.getElementById('kg-label');
+  if (isCardio) {
+    rLbl.textContent='MIN'; kLbl.textContent='KM'; box.style.display='none'; return;
+  }
+  rLbl.textContent='REPS';
+  if (!isBW) { box.style.display='none'; kLbl.textContent='KG'; return; }
   const bw=getSettings().bodyweight;
-  lbl.textContent='+KG (ekstra)';
-  box.style.display='';
+  kLbl.textContent='+KG (ekstra)'; box.style.display='';
   document.getElementById('bw-info-content').innerHTML = bw
     ? `<span style="font-size:13px">Kropsvægt: <strong style="color:#34d399">${bw} kg</strong> — tilføj evt. ekstra kg per set</span>`
     : `<span style="font-size:13px;color:#fb923c">⚠️ Sæt din kropsvægt i <button onclick="openSettings()" style="background:none;border:none;color:#60a5fa;cursor:pointer;font-size:13px;font-weight:600;padding:0">Indstillinger ⚙️</button> for at beregne volumen</span>`;
 }
+function updateBWInfo(exName) { updateExerciseMode(exName); }
 
 // ── Helpers ─────────────────────────────────────────────────────
 const calc1RM  = (w,r) => r<=0 ? w : Math.round(w*(1+r/30));
-const calcVol  = sets  => sets.reduce((s,x) => s + x.reps*x.weight, 0);
-const getMax1RM= sets  => Math.max(...sets.map(s => calc1RM(s.weight,s.reps)));
-const getMaxW  = sets  => Math.max(...sets.map(s => s.weight));
+const calcVol  = sets  => sets[0]?.cardio ? sets.reduce((s,x)=>s+x.distance,0) : sets.reduce((s,x) => s + x.reps*x.weight, 0);
+const getMax1RM= sets  => sets[0]?.cardio ? 0 : Math.max(...sets.map(s => calc1RM(s.weight,s.reps)));
+const getMaxW  = sets  => sets[0]?.cardio ? 0 : Math.max(...sets.map(s => s.weight));
 
 // ── Fuzzy search ─────────────────────────────────────────────────
 function fuzzyScore(str, q) {
@@ -324,7 +333,7 @@ function onExInput(val) {
   const box  = document.getElementById('hint-box');
   if (last) {
     box.style.display='';
-    document.getElementById('hint-sets').innerHTML=last.sets.map(s=>`<span class="hint-chip">${s.reps}×${s.weight}kg</span>`).join('');
+    document.getElementById('hint-sets').innerHTML=last.sets.map(s=>s.cardio?`<span class="hint-chip">${s.duration}min · ${s.distance}km</span>`:`<span class="hint-chip">${s.reps}×${s.weight}kg</span>`).join('');
   } else box.style.display='none';
   updateBWInfo(val);
 }
@@ -409,17 +418,25 @@ function renumberSets() {
 function saveWorkout() {
   const ex=document.getElementById('exercise-input').value.trim();
   if (!ex) return alert('Indtast øvelsesnavn!');
-  const isBW=BW_EXERCISES.has(ex);
+  const isBW    = BW_EXERCISES.has(ex);
+  const isCardio= CARDIO_EXERCISES.has(ex);
   const bw=getSettings().bodyweight;
   if (isBW&&!bw) return alert('Sæt din kropsvægt i Indstillinger (⚙️) før du logger denne øvelse!');
   const sets=[];
   document.querySelectorAll('#sets-container .set-row').forEach(row=>{
     const [i1,i2]=row.querySelectorAll('input');
-    const r=parseInt(i1.value),extra=parseFloat(i2.value)||0;
-    if (isBW) { if (r>0) sets.push({reps:r,weight:bw+extra,extraKg:extra,bw:true}); }
-    else { if (r>0&&extra>0) sets.push({reps:r,weight:extra}); }
+    if (isCardio) {
+      const dur=parseInt(i1.value)||0, dist=parseFloat(i2.value)||0;
+      if (dur>0||dist>0) sets.push({duration:dur,distance:dist,cardio:true});
+    } else if (isBW) {
+      const r=parseInt(i1.value),extra=parseFloat(i2.value)||0;
+      if (r>0) sets.push({reps:r,weight:bw+extra,extraKg:extra,bw:true});
+    } else {
+      const r=parseInt(i1.value),w=parseFloat(i2.value);
+      if (r>0&&w>0) sets.push({reps:r,weight:w});
+    }
   });
-  if (!sets.length) return alert('Tilføj mindst ét set med reps'+(isBW?'':' og kg')+'!');
+  if (!sets.length) return alert('Tilføj mindst ét set!');
   workouts.unshift({id:Date.now(),exercise:ex,sets,date:new Date().toISOString(),displayDate:new Date().toLocaleDateString('da-DK')});
   save();
   document.getElementById('exercise-input').value='';
@@ -440,13 +457,17 @@ function cancelEditWorkout(id) {
 }
 function saveEditWorkout(id) {
   const w=workouts.find(x=>x.id===id); if (!w) return;
+  const isCardio=w.sets[0]?.cardio;
   const setsMap={};
   document.querySelectorAll(`[data-edit-id="${id}"]`).forEach(inp=>{
     const i=inp.dataset.idx;
     if (!setsMap[i]) setsMap[i]={};
-    setsMap[i][inp.dataset.field]=inp.dataset.field==='reps'?parseInt(inp.value):parseFloat(inp.value);
+    setsMap[i][inp.dataset.field]=parseFloat(inp.value)||0;
+    if (isCardio) setsMap[i].cardio=true;
   });
-  const newSets=Object.values(setsMap).filter(s=>s.reps>0&&s.weight>0);
+  const newSets=isCardio
+    ? Object.values(setsMap).filter(s=>s.duration>0||s.distance>0)
+    : Object.values(setsMap).filter(s=>s.reps>0&&s.weight>0);
   if (!newSets.length) return alert('Tilføj mindst ét set!');
   w.sets=newSets; save(); editingCards.delete(id); renderLog(); updateStats();
 }
@@ -471,11 +492,12 @@ function renderLog() {
         <div class="w-card-header" onclick="toggleCard(${w.id})">
           <div class="w-card-left">
             <div class="w-card-name">${w.exercise}</div>
-            <div class="w-card-meta">${w.sets.length} sets · max ${getMaxW(w.sets)}kg</div>
+            <div class="w-card-meta">${w.sets[0]?.cardio ? `${w.sets.reduce((s,x)=>s+x.duration,0)} min · ${w.sets.reduce((s,x)=>s+x.distance,0).toFixed(1)} km` : `${w.sets.length} sets · max ${getMaxW(w.sets)}kg`}</div>
           </div>
           <div class="w-card-right">
-            <span class="chip chip-blue">${calcVol(w.sets)}kg</span>
-            <span class="chip chip-orange">1RM ${getMax1RM(w.sets)}kg</span>
+            ${w.sets[0]?.cardio
+              ? `<span class="chip chip-blue">${w.sets.reduce((s,x)=>s+x.distance,0).toFixed(1)} km</span><span class="chip chip-orange">${w.sets.reduce((s,x)=>s+x.duration,0)} min</span>`
+              : `<span class="chip chip-blue">${calcVol(w.sets)}kg</span><span class="chip chip-orange">1RM ${getMax1RM(w.sets)}kg</span>`}
             <button class="btn-icon" onclick="event.stopPropagation();startEditWorkout(${w.id})" title="Rediger">✏️</button>
             <button class="btn-del" onclick="event.stopPropagation();deleteWorkout(${w.id})">🗑</button>
             <span class="expand-icon" style="transform:rotate(${open?'180':'0'}deg)">▼</span>
@@ -486,8 +508,8 @@ function renderLog() {
             ${w.sets.map((s,i)=>`
               <div class="set-row" style="margin-bottom:6px">
                 <span style="color:#64748b;font-size:12px;font-weight:600;text-align:center">${i+1}</span>
-                <input type="number" value="${s.reps}" min="1" inputmode="numeric" data-edit-id="${w.id}" data-idx="${i}" data-field="reps">
-                <input type="number" value="${s.weight}" min="0" step="0.5" inputmode="decimal" data-edit-id="${w.id}" data-idx="${i}" data-field="weight">
+                <input type="number" value="${s.cardio?s.duration:s.reps}" min="0" inputmode="numeric" data-edit-id="${w.id}" data-idx="${i}" data-field="${s.cardio?'duration':'reps'}">
+                <input type="number" value="${s.cardio?s.distance:s.weight}" min="0" step="${s.cardio?'0.1':'0.5'}" inputmode="decimal" data-edit-id="${w.id}" data-idx="${i}" data-field="${s.cardio?'distance':'weight'}">
                 <span></span>
               </div>`).join('')}
             <div style="display:flex;gap:6px;margin-top:4px">
@@ -495,7 +517,9 @@ function renderLog() {
               <button class="btn btn-secondary" style="margin-top:0" onclick="cancelEditWorkout(${w.id})">Annuller</button>
             </div>
           </div>`
-        :`<div class="sets-grid">${w.sets.map((s,i)=>`<span class="set-chip"><strong>S${i+1}</strong> ${s.reps}×${s.weight}kg</span>`).join('')}</div>`)
+        :`<div class="sets-grid">${w.sets.map((s,i)=>s.cardio
+          ? `<span class="set-chip"><strong>S${i+1}</strong> ${s.duration}min · ${s.distance}km</span>`
+          : `<span class="set-chip"><strong>S${i+1}</strong> ${s.reps}×${s.weight}kg</span>`).join('')}</div>`)
         :''}</div>`;
     }).join('');
     return `<div class="date-group">
