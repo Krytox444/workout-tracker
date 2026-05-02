@@ -206,8 +206,8 @@ function fuzzyScore(str, q) {
 }
 function getMatches(query, limit=8) {
   const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
-  const custom = workouts.map(w=>w.exercise).filter(e=>!ALL_EX.includes(e));
-  const pool   = [...new Set([...ALL_EX,...custom])];
+  const fromWorkouts = workouts.map(w=>w.exercise).filter(e=>!ALL_EX.includes(e));
+  const pool = [...new Set([...ALL_EX, ...Object.keys(customCats), ...fromWorkouts])];
   if (!query) return pool.slice(0,limit).map(ex=>({ex,score:50}));
 
   // Check if query matches a category name
