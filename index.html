@@ -1,542 +1,318 @@
 <!DOCTYPE html>
 <html lang="da">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#0f172a">
-    <title>Workout Tracker</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://unpkg.com/recharts@2.10.3/dist/Recharts.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f172a">
+<title>Workout Tracker</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:linear-gradient(135deg,#0f172a,#1e293b);min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#fff;padding:16px}
+  .container{max-width:600px;margin:0 auto}
+  .card{background:#1e293b;border:1px solid #334155;border-radius:16px;padding:20px;margin-bottom:16px}
+  h1{font-size:24px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:14px;transition:all .2s}
+  .tab.active{background:#2563eb;color:#fff}
+  .tab:not(.active){background:#334155;color:#94a3b8}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+  .stat{background:#334155;border-radius:12px;padding:16px}
+  .stat-label{font-size:12px;color:#94a3b8;margin-bottom:4px}
+  .stat-value{font-size:28px;font-weight:700}
+  .blue{color:#60a5fa} .green{color:#34d399} .orange{color:#fb923c} .red{color:#f87171} .yellow{color:#fbbf24}
+  input,select{width:100%;padding:12px;background:#334155;border:1px solid #475569;border-radius:8px;color:#fff;font-size:16px;margin-bottom:8px;outline:none}
+  input:focus,select:focus{border-color:#2563eb}
+  input::placeholder{color:#64748b}
+  .set-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .set-row span{color:#94a3b8;font-weight:600;width:48px;font-size:14px;flex-shrink:0}
+  .set-row input{margin-bottom:0;flex:1}
+  .btn{width:100%;padding:12px;border:none;border-radius:8px;font-weight:600;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;margin-top:8px}
+  .btn-primary{background:#2563eb;color:#fff} .btn-primary:hover{background:#1d4ed8}
+  .btn-secondary{background:#334155;color:#fff} .btn-secondary:hover{background:#475569}
+  .btn-danger{background:none;border:none;color:#f87171;cursor:pointer;padding:8px;border-radius:8px}
+  .workout-item{background:#1e293b;border:1px solid #334155;border-radius:12px;padding:16px;margin-bottom:12px}
+  .workout-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .workout-name{font-weight:600;font-size:18px}
+  .workout-date{font-size:12px;color:#64748b}
+  .set-line{color:#94a3b8;font-size:14px;margin-bottom:2px}
+  .workout-footer{display:flex;gap:16px;margin-top:8px;padding-top:8px;border-top:1px solid #334155}
+  .badge{font-size:13px;font-weight:600}
+  .last-session{background:#334155;border-radius:8px;padding:12px;margin-bottom:8px}
+  .last-session p{font-size:12px;color:#94a3b8;margin-bottom:4px}
+  .last-session span{font-size:13px;color:#cbd5e1}
+  /* Progress tab */
+  .exercise-card{background:#334155;border-radius:12px;padding:16px;margin-bottom:12px}
+  .exercise-card h3{font-size:18px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between}
+  .exercise-card h3 small{font-size:13px;color:#94a3b8;font-weight:400}
+  .progress-badge{display:flex;align-items:center;gap:8px;padding:10px;border-radius:8px;margin-bottom:12px;font-weight:600}
+  .progress-badge.good{background:rgba(16,185,129,.15);border:1px solid #059669}
+  .progress-badge.bad{background:rgba(234,179,8,.15);border:1px solid #ca8a04}
+  .metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .metric{background:#1e293b;border-radius:8px;padding:12px}
+  .metric-label{font-size:12px;color:#94a3b8;margin-bottom:4px}
+  .metric-value{font-size:22px;font-weight:700}
+  .metric-sub{font-size:12px;margin-top:2px}
+  /* SVG Chart */
+  .chart-wrap{width:100%;overflow-x:auto}
+  svg.chart{display:block;width:100%;height:180px}
+  .empty{text-align:center;padding:48px 0;color:#64748b}
+  .empty svg{margin:0 auto 12px;display:block;opacity:.4}
+</style>
 </head>
 <body>
-    <div id="root"></div>
+<div class="container">
+  <div class="card">
+    <h1>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2"><path d="M6.5 6.5l11 11M17 7l1.5-1.5a2 2 0 0 1 2.83 2.83L19.83 9.8a2 2 0 0 1-2.83 0L17 9.63A2 2 0 0 1 17 7zM7 17l-1.5 1.5a2 2 0 0 1-2.83-2.83L4.17 14.2a2 2 0 0 1 2.83 0L7 14.37A2 2 0 0 1 7 17z"/></svg>
+      Workout Tracker
+    </h1>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
-        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } = Recharts;
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('log')">📋 Log træning</button>
+      <button class="tab" onclick="showTab('progress')">📈 Progression</button>
+    </div>
 
-        // Icons as simple SVG components
-        const Plus = () => (
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-        );
+    <!-- LOG TAB -->
+    <div id="tab-log">
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Total øvelser</div><div class="stat-value" id="total-count">0</div></div>
+        <div class="stat"><div class="stat-label">Total volumen</div><div class="stat-value blue" id="total-vol">0 kg</div></div>
+      </div>
 
-        const Trash2 = ({ size = 20 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                <line x1="10" y1="11" x2="10" y2="17"></line>
-                <line x1="14" y1="11" x2="14" y2="17"></line>
-            </svg>
-        );
+      <input type="text" id="exercise-input" placeholder="Øvelse (fx Bænkpres)" oninput="onExerciseInput(this.value)" list="exercise-list" autocomplete="off">
+      <datalist id="exercise-list"></datalist>
 
-        const Dumbbell = ({ size = 32 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M14.4 14.4L9.6 9.6"></path>
-                <path d="M18.657 21.485a2 2 0 1 1-2.829-2.828l-1.767 1.768a2 2 0 1 1-2.829-2.829l6.364-6.364a2 2 0 1 1 2.829 2.829l-1.768 1.767a2 2 0 1 1 2.828 2.829z"></path>
-                <path d="M21.5 21.5l-1.4-1.4"></path>
-                <path d="M3.9 3.9l1.4 1.4"></path>
-                <path d="M6.404 12.768a2 2 0 1 1-2.829-2.829l1.768-1.767a2 2 0 1 1-2.828-2.829l2.828-2.828a2 2 0 1 1 2.829 2.828l1.767-1.768a2 2 0 1 1 2.829 2.829z"></path>
-            </svg>
-        );
+      <div id="last-session-box" style="display:none" class="last-session">
+        <p>Sidst du trænede denne øvelse:</p>
+        <div id="last-session-sets"></div>
+      </div>
 
-        const TrendingUp = ({ size = 18 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-                <polyline points="17 6 23 6 23 12"></polyline>
-            </svg>
-        );
+      <div id="sets-container"></div>
 
-        const Calendar = ({ size = 18 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
-        );
+      <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
+      <button class="btn btn-primary" onclick="saveWorkout()">💾 Gem øvelse</button>
+    </div>
 
-        const Target = ({ size = 18 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="10"></circle>
-                <circle cx="12" cy="12" r="6"></circle>
-                <circle cx="12" cy="12" r="2"></circle>
-            </svg>
-        );
+    <!-- PROGRESS TAB -->
+    <div id="tab-progress" style="display:none">
+      <select id="exercise-select" onchange="renderProgress()">
+        <option value="">Vælg en øvelse...</option>
+      </select>
+      <div id="progress-content"></div>
+    </div>
+  </div>
 
-        const Award = ({ size = 24 }) => (
-            <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="8" r="7"></circle>
-                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-            </svg>
-        );
+  <!-- WORKOUT LOG -->
+  <div id="workout-log"></div>
+</div>
 
-        function WorkoutTracker() {
-            const [workouts, setWorkouts] = useState([]);
-            const [exercise, setExercise] = useState('');
-            const [sets, setSets] = useState([{ reps: '', weight: '' }]);
-            const [selectedExercise, setSelectedExercise] = useState('');
-            const [view, setView] = useState('log');
+<script>
+let workouts = JSON.parse(localStorage.getItem('workouts') || '[]');
+let setCount = 1;
 
-            useEffect(() => {
-                loadWorkouts();
-            }, []);
+function save() { localStorage.setItem('workouts', JSON.stringify(workouts)); }
 
-            const loadWorkouts = () => {
-                try {
-                    const saved = localStorage.getItem('workouts');
-                    if (saved) {
-                        setWorkouts(JSON.parse(saved));
-                    }
-                } catch (error) {
-                    console.log('Ingen tidligere data fundet');
-                }
-            };
+function calc1RM(w, r) { return r === 1 ? w : Math.round(w * (1 + r / 30)); }
+function calcVolume(sets) { return sets.reduce((s, x) => s + x.reps * x.weight, 0); }
+function getMax1RM(sets) { return Math.max(...sets.map(s => calc1RM(s.weight, s.reps))); }
 
-            const saveWorkouts = (newWorkouts) => {
-                try {
-                    localStorage.setItem('workouts', JSON.stringify(newWorkouts));
-                } catch (error) {
-                    console.error('Kunne ikke gemme data:', error);
-                }
-            };
+function showTab(tab) {
+  document.getElementById('tab-log').style.display = tab === 'log' ? '' : 'none';
+  document.getElementById('tab-progress').style.display = tab === 'progress' ? '' : 'none';
+  document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', (tab === 'log') === (i === 0)));
+  if (tab === 'progress') renderExerciseSelect();
+  if (tab === 'log') renderLog();
+}
 
-            const addSet = () => {
-                setSets([...sets, { reps: '', weight: '' }]);
-            };
+function addSetRow(reps = '', weight = '') {
+  const c = document.getElementById('sets-container');
+  const div = document.createElement('div');
+  div.className = 'set-row';
+  div.innerHTML = `<span>Set ${setCount++}</span>
+    <input type="number" placeholder="Reps" value="${reps}" min="1">
+    <input type="number" placeholder="Kg" value="${weight}" min="0" step="0.5">
+    <button class="btn-danger" onclick="this.parentNode.remove(); renumberSets()">✕</button>`;
+  c.appendChild(div);
+}
 
-            const updateSet = (index, field, value) => {
-                const newSets = [...sets];
-                newSets[index][field] = value;
-                setSets(newSets);
-            };
+function renumberSets() {
+  document.querySelectorAll('#sets-container .set-row span').forEach((s, i) => s.textContent = `Set ${i + 1}`);
+  setCount = document.querySelectorAll('#sets-container .set-row').length + 1;
+}
 
-            const removeSet = (index) => {
-                if (sets.length > 1) {
-                    setSets(sets.filter((_, i) => i !== index));
-                }
-            };
+function onExerciseInput(val) {
+  const last = workouts.find(w => w.exercise.toLowerCase() === val.toLowerCase());
+  const box = document.getElementById('last-session-box');
+  if (last) {
+    box.style.display = '';
+    document.getElementById('last-session-sets').innerHTML = last.sets.map((s, i) =>
+      `<span>Set ${i + 1}: ${s.reps} reps @ ${s.weight}kg</span><br>`).join('');
+  } else {
+    box.style.display = 'none';
+  }
+}
 
-            const addWorkout = () => {
-                if (exercise && sets.some(s => s.reps && s.weight)) {
-                    const validSets = sets.filter(s => s.reps && s.weight);
-                    const newWorkout = {
-                        id: Date.now(),
-                        exercise,
-                        sets: validSets.map(s => ({
-                            reps: parseInt(s.reps),
-                            weight: parseInt(s.weight)
-                        })),
-                        date: new Date().toISOString(),
-                        displayDate: new Date().toLocaleDateString('da-DK')
-                    };
-                    const updatedWorkouts = [newWorkout, ...workouts];
-                    setWorkouts(updatedWorkouts);
-                    saveWorkouts(updatedWorkouts);
-                    setExercise('');
-                    setSets([{ reps: '', weight: '' }]);
-                }
-            };
+function saveWorkout() {
+  const ex = document.getElementById('exercise-input').value.trim();
+  if (!ex) return alert('Indtast øvelsesnavn!');
+  const rows = document.querySelectorAll('#sets-container .set-row');
+  const sets = [];
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    const r = parseInt(inputs[0].value), w = parseFloat(inputs[1].value);
+    if (r && w) sets.push({ reps: r, weight: w });
+  });
+  if (!sets.length) return alert('Tilføj mindst ét set!');
+  workouts.unshift({ id: Date.now(), exercise: ex, sets, date: new Date().toISOString(), displayDate: new Date().toLocaleDateString('da-DK') });
+  save();
+  document.getElementById('exercise-input').value = '';
+  document.getElementById('sets-container').innerHTML = '';
+  document.getElementById('last-session-box').style.display = 'none';
+  setCount = 1;
+  addSetRow();
+  renderLog();
+  updateStats();
+  updateDatalist();
+}
 
-            const deleteWorkout = (id) => {
-                const updatedWorkouts = workouts.filter(w => w.id !== id);
-                setWorkouts(updatedWorkouts);
-                saveWorkouts(updatedWorkouts);
-            };
+function deleteWorkout(id) {
+  workouts = workouts.filter(w => w.id !== id);
+  save(); renderLog(); updateStats();
+}
 
-            const calculateVolume = (workout) => {
-                return workout.sets.reduce((sum, set) => sum + (set.reps * set.weight), 0);
-            };
+function renderLog() {
+  const el = document.getElementById('workout-log');
+  if (!workouts.length) { el.innerHTML = '<div class="empty"><p>Ingen øvelser endnu. Start dit workout! 💪</p></div>'; return; }
+  el.innerHTML = workouts.map(w => `
+    <div class="workout-item">
+      <div class="workout-header">
+        <div>
+          <div class="workout-name">${w.exercise}</div>
+          <div class="workout-date">${w.displayDate}</div>
+        </div>
+        <button class="btn-danger" onclick="deleteWorkout(${w.id})">🗑</button>
+      </div>
+      ${w.sets.map((s, i) => `<div class="set-line">Set ${i + 1}: ${s.reps} reps @ ${s.weight}kg</div>`).join('')}
+      <div class="workout-footer">
+        <span class="badge blue">Volumen: ${calcVolume(w.sets)}kg</span>
+        <span class="badge orange">Est. 1RM: ${getMax1RM(w.sets)}kg</span>
+      </div>
+    </div>`).join('');
+}
 
-            const calculate1RM = (weight, reps) => {
-                if (reps === 1) return weight;
-                return Math.round(weight * (1 + reps / 30));
-            };
+function updateStats() {
+  document.getElementById('total-count').textContent = workouts.length;
+  document.getElementById('total-vol').textContent = workouts.reduce((s, w) => s + calcVolume(w.sets), 0) + ' kg';
+}
 
-            const getMax1RM = (workout) => {
-                return Math.max(...workout.sets.map(set => calculate1RM(set.weight, set.reps)));
-            };
+function updateDatalist() {
+  const exercises = [...new Set(workouts.map(w => w.exercise))];
+  document.getElementById('exercise-list').innerHTML = exercises.map(e => `<option value="${e}">`).join('');
+}
 
-            const totalVolume = workouts.reduce((sum, w) => sum + calculateVolume(w), 0);
+function renderExerciseSelect() {
+  const exercises = [...new Set(workouts.map(w => w.exercise))];
+  const sel = document.getElementById('exercise-select');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">Vælg en øvelse...</option>' + exercises.map(e => `<option value="${e}" ${e === current ? 'selected' : ''}>${e}</option>`).join('');
+  if (current) renderProgress();
+}
 
-            const uniqueExercises = [...new Set(workouts.map(w => w.exercise))];
+function renderProgress() {
+  const ex = document.getElementById('exercise-select').value;
+  const el = document.getElementById('progress-content');
+  if (!ex) { el.innerHTML = ''; return; }
 
-            const getProgressionData = (exerciseName) => {
-                return workouts
-                    .filter(w => w.exercise === exerciseName)
-                    .reverse()
-                    .map((w, index) => {
-                        const maxWeight = Math.max(...w.sets.map(s => s.weight));
-                        const totalVolume = calculateVolume(w);
-                        const estimated1RM = getMax1RM(w);
-                        return {
-                            session: index + 1,
-                            date: w.displayDate,
-                            'Max vægt (kg)': maxWeight,
-                            'Total volumen (kg)': totalVolume,
-                            'Estimeret 1RM (kg)': estimated1RM
-                        };
-                    });
-            };
+  const sessions = workouts.filter(w => w.exercise === ex).reverse();
+  if (sessions.length < 1) { el.innerHTML = '<div class="empty">Ingen data endnu</div>'; return; }
 
-            const getProgressiveOverload = (exerciseName) => {
-                const exerciseWorkouts = workouts
-                    .filter(w => w.exercise === exerciseName)
-                    .reverse();
-                
-                if (exerciseWorkouts.length < 2) return null;
+  // Overload vs previous session
+  let overloadHTML = '';
+  if (sessions.length >= 2) {
+    const latest = sessions[sessions.length - 1];
+    const prev = sessions[sessions.length - 2];
+    const volChange = calcVolume(latest.sets) - calcVolume(prev.sets);
+    const rmChange = getMax1RM(latest.sets) - getMax1RM(prev.sets);
+    const progressing = volChange > 0 || rmChange > 0;
+    overloadHTML = `
+      <div class="progress-badge ${progressing ? 'good' : 'bad'}">
+        ${progressing ? '🏆 Du progresserer!' : '⚠️ Ingen fremgang siden sidst'}
+      </div>
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Volumen ændring</div>
+          <div class="metric-value ${volChange >= 0 ? 'green' : 'red'}">${volChange >= 0 ? '+' : ''}${volChange}kg</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Styrke (1RM)</div>
+          <div class="metric-value ${rmChange >= 0 ? 'green' : 'red'}">${rmChange >= 0 ? '+' : ''}${rmChange}kg</div>
+        </div>
+      </div>`;
+  }
 
-                const latest = exerciseWorkouts[exerciseWorkouts.length - 1];
-                const previous = exerciseWorkouts[exerciseWorkouts.length - 2];
+  // SVG chart
+  const data = sessions.map(s => ({ date: s.displayDate, vol: calcVolume(s.sets), rm: getMax1RM(s.sets) }));
+  const chartHTML = sessions.length >= 2 ? drawChart(data) : '<p style="color:#64748b;font-size:13px;margin-top:8px">Log mindst 2 sessions for at se graf</p>';
 
-                const latestVolume = calculateVolume(latest);
-                const previousVolume = calculateVolume(previous);
-                const latest1RM = getMax1RM(latest);
-                const previous1RM = getMax1RM(previous);
+  el.innerHTML = `<div class="exercise-card">
+    <h3>${ex} <small>${sessions.length} sessions</small></h3>
+    ${overloadHTML}
+    <div class="metric-label" style="margin-bottom:8px">Progression over tid</div>
+    ${chartHTML}
+  </div>`;
+}
 
-                const volumeChange = latestVolume - previousVolume;
-                const volumePercent = ((volumeChange / previousVolume) * 100).toFixed(1);
-                const strengthChange = latest1RM - previous1RM;
-                const strengthPercent = ((strengthChange / previous1RM) * 100).toFixed(1);
+function drawChart(data) {
+  const W = 560, H = 160, PAD = { t: 10, r: 20, b: 30, l: 45 };
+  const iW = W - PAD.l - PAD.r, iH = H - PAD.t - PAD.b;
+  const vols = data.map(d => d.vol), rms = data.map(d => d.rm);
+  const allVals = [...vols, ...rms];
+  const minV = Math.min(...allVals) * 0.9, maxV = Math.max(...allVals) * 1.1;
+  const xStep = iW / (data.length - 1 || 1);
+  const yScale = v => iH - ((v - minV) / (maxV - minV || 1)) * iH;
+  const pts = (arr) => arr.map((v, i) => `${PAD.l + i * xStep},${PAD.t + yScale(v)}`).join(' ');
+  const n = data.length;
+  // Y axis labels
+  const yLabels = [minV, (minV + maxV) / 2, maxV].map(v => Math.round(v));
+  const yLabelHTML = yLabels.map((v, i) => {
+    const y = PAD.t + iH - (i / 2) * iH;
+    return `<text x="${PAD.l - 6}" y="${y + 4}" text-anchor="end" fill="#64748b" font-size="11">${v}</text>`;
+  }).join('');
+  // X axis labels (show max 5)
+  const step = Math.max(1, Math.floor(n / 5));
+  const xLabelHTML = data.filter((_, i) => i % step === 0 || i === n - 1).map((d, i, arr) => {
+    const origIdx = data.indexOf(d);
+    const x = PAD.l + origIdx * xStep;
+    const label = d.date.slice(0, 5); // dd/mm
+    return `<text x="${x}" y="${H - 6}" text-anchor="middle" fill="#64748b" font-size="10">${label}</text>`;
+  }).join('');
 
-                return {
-                    volumeChange,
-                    volumePercent,
-                    strengthChange,
-                    strengthPercent,
-                    isProgressing: volumeChange > 0 || strengthChange > 0
-                };
-            };
+  return `<div class="chart-wrap">
+  <svg class="chart" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <!-- grid -->
+    ${[0, 0.5, 1].map(t => `<line x1="${PAD.l}" y1="${PAD.t + iH * (1 - t)}" x2="${PAD.l + iW}" y2="${PAD.t + iH * (1 - t)}" stroke="#334155" stroke-width="1"/>`).join('')}
+    <!-- axes labels -->
+    ${yLabelHTML}${xLabelHTML}
+    <!-- volume line -->
+    <polyline points="${pts(vols)}" fill="none" stroke="#34d399" stroke-width="2" stroke-linejoin="round"/>
+    ${vols.map((v, i) => `<circle cx="${PAD.l + i * xStep}" cy="${PAD.t + yScale(v)}" r="4" fill="#34d399"/>`).join('')}
+    <!-- 1RM line -->
+    <polyline points="${pts(rms)}" fill="none" stroke="#fb923c" stroke-width="2" stroke-linejoin="round"/>
+    ${rms.map((v, i) => `<circle cx="${PAD.l + i * xStep}" cy="${PAD.t + yScale(v)}" r="4" fill="#fb923c"/>`).join('')}
+    <!-- legend -->
+    <rect x="${PAD.l}" y="${PAD.t}" width="10" height="10" rx="2" fill="#34d399"/>
+    <text x="${PAD.l + 14}" y="${PAD.t + 9}" fill="#94a3b8" font-size="11">Volumen (kg)</text>
+    <rect x="${PAD.l + 100}" y="${PAD.t}" width="10" height="10" rx="2" fill="#fb923c"/>
+    <text x="${PAD.l + 114}" y="${PAD.t + 9}" fill="#94a3b8" font-size="11">Est. 1RM (kg)</text>
+  </svg></div>`;
+}
 
-            const getLastWorkout = (exerciseName) => {
-                const exerciseWorkouts = workouts.filter(w => w.exercise === exerciseName);
-                return exerciseWorkouts.length > 0 ? exerciseWorkouts[0] : null;
-            };
-
-            return (
-                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
-                    <div className="max-w-4xl mx-auto">
-                        <div className="bg-slate-800 rounded-2xl shadow-2xl p-6 mb-6 border border-slate-700">
-                            <div className="flex items-center gap-3 mb-6">
-                                <div className="text-blue-400"><Dumbbell size={32} /></div>
-                                <h1 className="text-3xl font-bold text-white">Workout Tracker</h1>
-                            </div>
-
-                            <div className="flex gap-2 mb-6 flex-wrap">
-                                <button
-                                    onClick={() => setView('log')}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${
-                                        view === 'log' 
-                                            ? 'bg-blue-600 text-white' 
-                                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                                    }`}
-                                >
-                                    <Calendar size={18} />
-                                    Log træning
-                                </button>
-                                <button
-                                    onClick={() => setView('progress')}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${
-                                        view === 'progress' 
-                                            ? 'bg-blue-600 text-white' 
-                                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                                    }`}
-                                >
-                                    <TrendingUp size={18} />
-                                    Progression
-                                </button>
-                                <button
-                                    onClick={() => setView('overload')}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors ${
-                                        view === 'overload' 
-                                            ? 'bg-blue-600 text-white' 
-                                            : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                                    }`}
-                                >
-                                    <Target size={18} />
-                                    Progressive Overload
-                                </button>
-                            </div>
-
-                            {view === 'log' && (
-                                <>
-                                    <div className="grid grid-cols-2 gap-4 mb-6">
-                                        <div className="bg-slate-700 rounded-xl p-4 border border-slate-600">
-                                            <p className="text-slate-400 text-sm">Total øvelser</p>
-                                            <p className="text-3xl font-bold text-white">{workouts.length}</p>
-                                        </div>
-                                        <div className="bg-slate-700 rounded-xl p-4 border border-slate-600">
-                                            <p className="text-slate-400 text-sm">Total volumen (kg)</p>
-                                            <p className="text-3xl font-bold text-blue-400">{totalVolume}</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        <input
-                                            type="text"
-                                            placeholder="Øvelse (fx Bænkpres)"
-                                            value={exercise}
-                                            onChange={(e) => setExercise(e.target.value)}
-                                            list="exercises"
-                                            className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                        />
-                                        <datalist id="exercises">
-                                            {uniqueExercises.map(ex => (
-                                                <option key={ex} value={ex} />
-                                            ))}
-                                        </datalist>
-
-                                        {exercise && getLastWorkout(exercise) && (
-                                            <div className="bg-slate-700 border border-slate-600 rounded-lg p-3">
-                                                <p className="text-slate-400 text-sm mb-2">Sidste gang ({getLastWorkout(exercise).displayDate}):</p>
-                                                {getLastWorkout(exercise).sets.map((set, i) => (
-                                                    <p key={i} className="text-slate-300 text-sm">
-                                                        Set {i + 1}: {set.reps} reps @ {set.weight}kg
-                                                    </p>
-                                                ))}
-                                            </div>
-                                        )}
-                                        
-                                        <div className="space-y-2">
-                                            {sets.map((set, index) => (
-                                                <div key={index} className="flex gap-2 items-center">
-                                                    <span className="text-slate-400 font-semibold w-12">Set {index + 1}</span>
-                                                    <input
-                                                        type="number"
-                                                        placeholder="Reps"
-                                                        value={set.reps}
-                                                        onChange={(e) => updateSet(index, 'reps', e.target.value)}
-                                                        className="flex-1 px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    />
-                                                    <input
-                                                        type="number"
-                                                        placeholder="Kg"
-                                                        value={set.weight}
-                                                        onChange={(e) => updateSet(index, 'weight', e.target.value)}
-                                                        className="flex-1 px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                    />
-                                                    {sets.length > 1 && (
-                                                        <button
-                                                            onClick={() => removeSet(index)}
-                                                            className="text-red-400 hover:text-red-300 hover:bg-red-950 p-2 rounded-lg transition-colors"
-                                                        >
-                                                            <Trash2 size={20} />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            ))}
-                                        </div>
-
-                                        <button
-                                            onClick={addSet}
-                                            className="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 rounded-lg transition-colors"
-                                        >
-                                            + Tilføj set
-                                        </button>
-
-                                        <button
-                                            onClick={addWorkout}
-                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors"
-                                        >
-                                            <Plus />
-                                            Gem øvelse
-                                        </button>
-                                    </div>
-                                </>
-                            )}
-
-                            {view === 'progress' && (
-                                <div className="space-y-4">
-                                    <select
-                                        value={selectedExercise}
-                                        onChange={(e) => setSelectedExercise(e.target.value)}
-                                        className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    >
-                                        <option value="">Vælg en øvelse</option>
-                                        {uniqueExercises.map(ex => (
-                                            <option key={ex} value={ex}>{ex}</option>
-                                        ))}
-                                    </select>
-
-                                    {selectedExercise && (
-                                        <div className="bg-slate-700 rounded-xl p-6 border border-slate-600">
-                                            <h3 className="text-xl font-bold text-white mb-4">{selectedExercise}</h3>
-                                            <ResponsiveContainer width="100%" height={300}>
-                                                <LineChart data={getProgressionData(selectedExercise)}>
-                                                    <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
-                                                    <XAxis 
-                                                        dataKey="date" 
-                                                        stroke="#94a3b8"
-                                                        style={{ fontSize: '12px' }}
-                                                    />
-                                                    <YAxis 
-                                                        stroke="#94a3b8"
-                                                        style={{ fontSize: '12px' }}
-                                                    />
-                                                    <Tooltip 
-                                                        contentStyle={{ 
-                                                            backgroundColor: '#1e293b', 
-                                                            border: '1px solid #475569',
-                                                            borderRadius: '8px'
-                                                        }}
-                                                    />
-                                                    <Legend />
-                                                    <Line 
-                                                        type="monotone" 
-                                                        dataKey="Estimeret 1RM (kg)" 
-                                                        stroke="#f59e0b" 
-                                                        strokeWidth={2}
-                                                        dot={{ fill: '#f59e0b', r: 4 }}
-                                                    />
-                                                    <Line 
-                                                        type="monotone" 
-                                                        dataKey="Total volumen (kg)" 
-                                                        stroke="#10b981" 
-                                                        strokeWidth={2}
-                                                        dot={{ fill: '#10b981', r: 4 }}
-                                                    />
-                                                </LineChart>
-                                            </ResponsiveContainer>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-
-                            {view === 'overload' && (
-                                <div className="space-y-4">
-                                    {uniqueExercises.length === 0 ? (
-                                        <div className="text-center py-12">
-                                            <div className="flex justify-center mb-4 text-slate-600">
-                                                <Target size={48} />
-                                            </div>
-                                            <p className="text-slate-400 text-lg">Log mindst 2 træningspas for at se progressive overload</p>
-                                        </div>
-                                    ) : (
-                                        uniqueExercises.map(ex => {
-                                            const overload = getProgressiveOverload(ex);
-                                            const workoutCount = workouts.filter(w => w.exercise === ex).length;
-                                            
-                                            return (
-                                                <div key={ex} className="bg-slate-700 rounded-xl p-5 border border-slate-600">
-                                                    <div className="flex items-start justify-between mb-3">
-                                                        <h3 className="text-xl font-bold text-white">{ex}</h3>
-                                                        <span className="text-slate-400 text-sm">{workoutCount} sessions</span>
-                                                    </div>
-                                                    
-                                                    {overload ? (
-                                                        <div className="space-y-3">
-                                                            <div className={`flex items-center gap-2 p-3 rounded-lg ${
-                                                                overload.isProgressing ? 'bg-green-900/30 border border-green-700' : 'bg-yellow-900/30 border border-yellow-700'
-                                                            }`}>
-                                                                <div className={overload.isProgressing ? 'text-green-400' : 'text-yellow-400'}>
-                                                                    <Award size={24} />
-                                                                </div>
-                                                                <span className={`font-semibold ${overload.isProgressing ? 'text-green-400' : 'text-yellow-400'}`}>
-                                                                    {overload.isProgressing ? 'Du progresserer! 🎉' : 'Ingen fremgang endnu'}
-                                                                </span>
-                                                            </div>
-
-                                                            <div className="grid grid-cols-2 gap-3">
-                                                                <div className="bg-slate-800 rounded-lg p-3">
-                                                                    <p className="text-slate-400 text-sm mb-1">Volumen ændring</p>
-                                                                    <p className={`text-2xl font-bold ${overload.volumeChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                                                        {overload.volumeChange >= 0 ? '+' : ''}{overload.volumeChange}kg
-                                                                    </p>
-                                                                    <p className={`text-sm ${overload.volumePercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                                                        {overload.volumePercent >= 0 ? '+' : ''}{overload.volumePercent}%
-                                                                    </p>
-                                                                </div>
-
-                                                                <div className="bg-slate-800 rounded-lg p-3">
-                                                                    <p className="text-slate-400 text-sm mb-1">Styrke ændring (1RM)</p>
-                                                                    <p className={`text-2xl font-bold ${overload.strengthChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                                                        {overload.strengthChange >= 0 ? '+' : ''}{overload.strengthChange}kg
-                                                                    </p>
-                                                                    <p className={`text-sm ${overload.strengthPercent >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                                                        {overload.strengthPercent >= 0 ? '+' : ''}{overload.strengthPercent}%
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <p className="text-slate-400">Log mindst 2 træningspas for at se progression</p>
-                                                    )}
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
-                            )}
-                        </div>
-
-                        {view === 'log' && (
-                            <div className="space-y-3">
-                                {workouts.map((workout) => (
-                                    <div
-                                        key={workout.id}
-                                        className="bg-slate-800 border border-slate-700 rounded-xl p-4 hover:border-slate-600 transition-colors"
-                                    >
-                                        <div className="flex items-start justify-between mb-2">
-                                            <div className="flex-1">
-                                                <h3 className="text-white font-semibold text-lg">{workout.exercise}</h3>
-                                                <p className="text-slate-500 text-sm">{workout.displayDate}</p>
-                                            </div>
-                                            <button
-                                                onClick={() => deleteWorkout(workout.id)}
-                                                className="text-red-400 hover:text-red-300 hover:bg-red-950 p-2 rounded-lg transition-colors"
-                                            >
-                                                <Trash2 size={20} />
-                                            </button>
-                                        </div>
-                                        <div className="space-y-1">
-                                            {workout.sets.map((set, index) => (
-                                                <p key={index} className="text-slate-400">
-                                                    Set {index + 1}: {set.reps} reps @ {set.weight}kg
-                                                </p>
-                                            ))}
-                                            <div className="flex gap-4 mt-2 pt-2 border-t border-slate-700">
-                                                <p className="text-blue-400 font-semibold text-sm">
-                                                    Volumen: {calculateVolume(workout)}kg
-                                                </p>
-                                                <p className="text-orange-400 font-semibold text-sm">
-                                                    Est. 1RM: {getMax1RM(workout)}kg
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        {workouts.length === 0 && view === 'log' && (
-                            <div className="text-center py-12">
-                                <div className="flex justify-center mb-4 text-slate-600">
-                                    <Dumbbell size={48} />
-                                </div>
-                                <p className="text-slate-400 text-lg">Ingen øvelser endnu. Start dit workout!</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        }
-
-        ReactDOM.render(<WorkoutTracker />, document.getElementById('root'));
-    </script>
+// Init
+addSetRow();
+renderLog();
+updateStats();
+updateDatalist();
+</script>
 </body>
 </html>
