@@ -89,6 +89,11 @@ svg.chart{display:block;width:100%;overflow:visible}
 .tt-date{color:#64748b;margin-bottom:4px;font-size:11px}
 .tt-row{display:flex;align-items:center;gap:5px;margin-bottom:2px}
 .tt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+/* Superset */
+.sup-ex-block{background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px;margin-bottom:6px}
+.sup-ex-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em}
+.sup-connector{text-align:center;color:#475569;font-size:11px;font-weight:700;letter-spacing:.08em;padding:4px 0;margin:2px 0}
+.sup-badge{background:#312e81;color:#a5b4fc;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.04em}
 /* Misc */
 .section-label{font-size:11px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
 .empty{text-align:center;padding:40px 0;color:#475569}
@@ -143,6 +148,14 @@ svg.chart{display:block;width:100%;overflow:visible}
     <div id="sets-container"></div>
     <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
     <button class="btn btn-primary" onclick="saveWorkout()">💾 Log set</button>
+    <button class="btn btn-secondary" onclick="toggleSupersetForm()" id="sup-toggle-btn">🔄 Log superset</button>
+    <div id="superset-form" style="display:none;margin-top:8px">
+      <div class="section-label">Superset</div>
+      <div id="sup-ex-container"></div>
+      <button class="btn btn-secondary" onclick="addSupExercise()" style="margin-top:4px">+ Tilføj øvelse</button>
+      <button class="btn btn-primary" onclick="saveSuperset()">💾 Log superset</button>
+      <button class="btn btn-secondary" onclick="toggleSupersetForm()">Annuller</button>
+    </div>
   </div>
 
   <!-- TEMPLATES -->
@@ -488,6 +501,31 @@ function renderLog() {
     const cards=ws.map(w=>{
       const open=expandedCards.has(w.id);
       const editing=editingCards.has(w.id);
+      if (w.type==='superset') {
+        const supVol=w.exercises.reduce((t,ex)=>t+calcVol(ex.sets),0);
+        const supName=w.exercises.map(e=>e.name).join(' + ');
+        return `<div class="w-card">
+          <div class="w-card-header" onclick="toggleCard(${w.id})">
+            <div class="w-card-left">
+              <div class="w-card-name" style="display:flex;align-items:center;gap:6px"><span class="sup-badge">SS</span>${supName}</div>
+              <div class="w-card-meta">${w.exercises.length} øvelser · ${w.exercises.reduce((t,ex)=>t+ex.sets.length,0)} sets total</div>
+            </div>
+            <div class="w-card-right">
+              <span class="chip chip-blue">${supVol}kg</span>
+              <button class="btn-del" onclick="event.stopPropagation();deleteWorkout(${w.id})">🗑</button>
+              <span class="expand-icon" style="transform:rotate(${open?'180':'0'}deg)">▼</span>
+            </div>
+          </div>
+          ${open?`<div style="padding:8px 12px 12px">
+            ${w.exercises.map((ex,ei)=>`
+              ${ei>0?'<div class="sup-connector" style="margin:6px 0">⊕ SUPERSET</div>':''}
+              <div style="font-size:13px;font-weight:700;margin-bottom:4px;color:#e2e8f0">${ex.name}</div>
+              <div class="sets-grid" style="padding:0;border:none;margin-bottom:0">
+                ${ex.sets.map((s,i)=>`<span class="set-chip"><strong>S${i+1}</strong> ${s.reps}×${s.weight}kg</span>`).join('')}
+              </div>`).join('')}
+          </div>`:''}
+        </div>`;
+      }
       return `<div class="w-card">
         <div class="w-card-header" onclick="toggleCard(${w.id})">
           <div class="w-card-left">
@@ -537,7 +575,93 @@ function renderLog() {
 }
 function updateStats() {
   document.getElementById('total-count').textContent=workouts.length;
-  document.getElementById('total-vol').textContent=workouts.reduce((s,w)=>s+calcVol(w.sets),0)+' kg';
+  const vol=workouts.reduce((s,w)=>s+(w.type==='superset'?w.exercises.reduce((t,ex)=>t+calcVol(ex.sets),0):calcVol(w.sets||[])),0);
+  document.getElementById('total-vol').textContent=vol+' kg';
+}
+
+// ── Superset ─────────────────────────────────────────────────────
+let supExCount=0, supExNames={}, currentSupIdx=null;
+
+function toggleSupersetForm() {
+  const form=document.getElementById('superset-form');
+  const showing=form.style.display!=='none';
+  form.style.display=showing?'none':'';
+  if (!showing) {
+    supExCount=0; supExNames={};
+    document.getElementById('sup-ex-container').innerHTML='';
+    addSupExercise(); addSupExercise();
+  }
+}
+function addSupExercise() {
+  const idx=supExCount++;
+  const c=document.getElementById('sup-ex-container');
+  if (idx>0) {
+    const conn=document.createElement('div');
+    conn.className='sup-connector'; conn.id=`sup-conn-${idx}`;
+    conn.textContent='⊕ SUPERSET'; c.appendChild(conn);
+  }
+  const block=document.createElement('div');
+  block.className='sup-ex-block'; block.id=`sup-block-${idx}`;
+  block.innerHTML=`
+    <div class="sup-ex-header">
+      <span>Øvelse ${idx+1}</span>
+      ${idx>=2?`<button class="btn-del" onclick="removeSupEx(${idx})">✕</button>`:''}
+    </div>
+    <div class="search-wrap">
+      <input type="text" id="sup-input-${idx}" placeholder="Søg øvelse..." oninput="onSupExInput(${idx},this.value)" autocomplete="off" style="margin-bottom:6px">
+      <div class="dropdown" id="sup-dd-${idx}"></div>
+    </div>
+    <div class="set-row" style="margin-bottom:4px">
+      <span></span><span style="font-size:11px;color:#475569;text-align:center">REPS</span><span style="font-size:11px;color:#475569;text-align:center">KG</span><span></span>
+    </div>
+    <div id="sup-sets-${idx}"></div>
+    <button class="btn btn-secondary" style="padding:8px;font-size:13px;margin-top:4px" onclick="addSupSetRow(${idx})">+ Tilføj set</button>`;
+  c.appendChild(block);
+  addSupSetRow(idx);
+}
+function removeSupEx(idx) {
+  document.getElementById(`sup-block-${idx}`)?.remove();
+  document.getElementById(`sup-conn-${idx}`)?.remove();
+  delete supExNames[idx];
+}
+function onSupExInput(idx, val) {
+  currentSupIdx=idx;
+  renderDD(`sup-dd-${idx}`, val, 'selectCurrentSupEx');
+}
+function selectCurrentSupEx(name) {
+  const idx=currentSupIdx;
+  supExNames[idx]=name;
+  document.getElementById(`sup-input-${idx}`).value=name;
+  closeDD();
+}
+function addSupSetRow(idx, reps='', weight='') {
+  const c=document.getElementById(`sup-sets-${idx}`); if (!c) return;
+  const n=c.querySelectorAll('.set-row').length+1;
+  const d=document.createElement('div'); d.className='set-row';
+  d.innerHTML=`<span style="color:#64748b;font-size:12px;font-weight:600;text-align:center">${n}</span>
+    <input type="number" placeholder="0" value="${reps}" min="1" inputmode="numeric">
+    <input type="number" placeholder="0" value="${weight}" min="0" step="0.5" inputmode="decimal">
+    <button class="btn-del" onclick="this.parentNode.remove()">✕</button>`;
+  c.appendChild(d);
+}
+function saveSuperset() {
+  const exercises=[];
+  for (let i=0;i<supExCount;i++) {
+    const block=document.getElementById(`sup-block-${i}`); if (!block) continue;
+    const name=(document.getElementById(`sup-input-${i}`)?.value||'').trim(); if (!name) continue;
+    const isBW=BW_EXERCISES.has(name), bw=getSettings().bodyweight;
+    const sets=[];
+    block.querySelectorAll('.set-row').forEach(row=>{
+      const [i1,i2]=row.querySelectorAll('input');
+      const r=parseInt(i1.value),w=parseFloat(i2.value)||0;
+      if (isBW) { if (r>0&&bw) sets.push({reps:r,weight:bw+w,extraKg:w,bw:true}); }
+      else { if (r>0&&w>0) sets.push({reps:r,weight:w}); }
+    });
+    if (name&&sets.length) exercises.push({name,sets});
+  }
+  if (exercises.length<2) return alert('Tilføj mindst 2 øvelser med sets til supersettet!');
+  workouts.unshift({id:Date.now(),type:'superset',exercises,date:new Date().toISOString(),displayDate:new Date().toLocaleDateString('da-DK')});
+  save(); toggleSupersetForm(); renderLog(); updateStats();
 }
 
 // ── Templates ────────────────────────────────────────────────────
@@ -649,16 +773,26 @@ function showTplOptions(id) {
 
 // ── Progression ──────────────────────────────────────────────────
 function renderExSelect() {
-  const exercises=[...new Set(workouts.map(w=>w.exercise))];
+  const exercises=new Set();
+  workouts.forEach(w=>{
+    if (w.type==='superset') w.exercises.forEach(ex=>exercises.add(ex.name));
+    else if (w.exercise) exercises.add(w.exercise);
+  });
   const sel=document.getElementById('ex-select'), cur=sel.value;
   sel.innerHTML='<option value="">Vælg øvelse...</option>'
-    +exercises.map(e=>`<option ${e===cur?'selected':''} value="${e}">${e}</option>`).join('');
+    +[...exercises].map(e=>`<option ${e===cur?'selected':''} value="${e}">${e}</option>`).join('');
 }
 function renderProgress() {
   const ex=document.getElementById('ex-select').value;
   const el=document.getElementById('progress-content');
   if (!ex) { el.innerHTML=''; return; }
-  const sessions=workouts.filter(w=>w.exercise===ex).reverse();
+  const sessions=workouts.filter(w=>{
+    if (w.type==='superset') return w.exercises.some(e=>e.name===ex);
+    return w.exercise===ex;
+  }).map(w=>{
+    if (w.type==='superset') { const e=w.exercises.find(e=>e.name===ex); return {...w,sets:e.sets,exercise:ex}; }
+    return w;
+  }).reverse();
   if (!sessions.length) { el.innerHTML='<div class="empty">Ingen data</div>'; return; }
   let overloadHTML='';
   if (sessions.length>=2) {
