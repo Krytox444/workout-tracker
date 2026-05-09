@@ -148,7 +148,7 @@ svg.chart{display:block;width:100%;overflow:visible}
     <div id="sets-container"></div>
     <button class="btn btn-secondary" onclick="addSetRow()">+ Tilføj set</button>
     <button class="btn btn-primary" onclick="saveWorkout()">💾 Log set</button>
-    <button class="btn btn-secondary" onclick="toggleSupersetForm()" id="sup-toggle-btn">🔄 Log superset</button>
+    <button class="btn btn-secondary" onclick="toggleSupersetForm()" id="sup-toggle-btn">🔄 Superset</button>
     <div id="superset-form" style="display:none;margin-top:8px">
       <div class="section-label">Superset</div>
       <div id="sup-ex-container"></div>
@@ -653,6 +653,7 @@ function saveSuperset() {
     const sets=[];
     block.querySelectorAll('.set-row').forEach(row=>{
       const [i1,i2]=row.querySelectorAll('input');
+      if (!i1||!i2) return; // skip header row
       const r=parseInt(i1.value),w=parseFloat(i2.value)||0;
       if (isBW) { if (r>0&&bw) sets.push({reps:r,weight:bw+w,extraKg:w,bw:true}); }
       else { if (r>0&&w>0) sets.push({reps:r,weight:w}); }
