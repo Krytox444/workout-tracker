@@ -497,7 +497,7 @@ function renderLog() {
   workouts.forEach(w=>{ (groups[w.displayDate]=groups[w.displayDate]||[]).push(w); });
   el.innerHTML=Object.entries(groups).map(([date,ws])=>{
     const expanded=expandedDates.has(date);
-    const totalVol=ws.reduce((s,w)=>s+calcVol(w.sets),0);
+    const totalVol=ws.reduce((s,w)=>s+(w.type==='superset'?w.exercises.reduce((t,ex)=>t+calcVol(ex.sets),0):calcVol(w.sets||[])),0);
     const cards=ws.map(w=>{
       const open=expandedCards.has(w.id);
       const editing=editingCards.has(w.id);
