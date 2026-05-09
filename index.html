@@ -269,9 +269,9 @@ function updateBWInfo(exName) { updateExerciseMode(exName); }
 
 // ── Helpers ─────────────────────────────────────────────────────
 const calc1RM  = (w,r) => r<=0 ? w : Math.round(w*(1+r/30));
-const calcVol  = sets  => sets[0]?.cardio ? sets.reduce((s,x)=>s+x.distance,0) : sets.reduce((s,x) => s + x.reps*x.weight, 0);
-const getMax1RM= sets  => sets[0]?.cardio ? 0 : Math.max(...sets.map(s => calc1RM(s.weight,s.reps)));
-const getMaxW  = sets  => sets[0]?.cardio ? 0 : Math.max(...sets.map(s => s.weight));
+const calcVol  = sets  => { if (!sets||!sets.length) return 0; return sets[0]?.cardio ? sets.reduce((s,x)=>s+(x.distance||0),0) : sets.reduce((s,x)=>s+(x.reps||0)*(x.weight||0),0); };
+const getMax1RM= sets  => { if (!sets||!sets.length) return 0; return sets[0]?.cardio ? 0 : Math.max(0,...sets.map(s=>calc1RM(s.weight||0,s.reps||0))); };
+const getMaxW  = sets  => { if (!sets||!sets.length) return 0; return sets[0]?.cardio ? 0 : Math.max(0,...sets.map(s=>s.weight||0)); };
 
 // ── Fuzzy search ─────────────────────────────────────────────────
 function fuzzyScore(str, q) {
@@ -287,7 +287,7 @@ function fuzzyScore(str, q) {
 }
 function getMatches(query, limit=8) {
   const customCats = JSON.parse(localStorage.getItem('wt_custom_cats') || '{}');
-  const fromWorkouts = workouts.map(w=>w.exercise).filter(e=>!ALL_EX.includes(e));
+  const fromWorkouts = workouts.map(w=>w.exercise).filter(e=>e&&!ALL_EX.includes(e));
   const pool = [...new Set([...ALL_EX, ...Object.keys(customCats), ...fromWorkouts])];
   if (!query) return pool.slice(0,limit).map(ex=>({ex,score:50}));
 
